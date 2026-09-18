@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import Svg, { Circle, Path, Defs, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Path, Defs, RadialGradient, Stop, ClipPath, G } from 'react-native-svg';
 
 interface VinylRecordProps {
   size?: number;
@@ -11,7 +11,7 @@ export default function VinylRecord({ size = 300 }: VinylRecordProps) {
   const radius = size / 2;
 
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
+    <View style={[styles.container, { width: size, height: size, borderRadius: size / 2 }]}>
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <Defs>
           {/* Dégradé pour le macaron central (Or brossé / Rose Gold) */}
@@ -27,6 +27,10 @@ export default function VinylRecord({ size = 300 }: VinylRecordProps) {
             <Stop offset="80%" stopColor="#0a0a0a" />
             <Stop offset="100%" stopColor="#000000" />
           </RadialGradient>
+          
+          <ClipPath id="vinylClip">
+            <Circle cx={center} cy={center} r={radius} />
+          </ClipPath>
         </Defs>
 
         {/* Base du Vinyle */}
@@ -47,14 +51,16 @@ export default function VinylRecord({ size = 300 }: VinylRecordProps) {
 
         {/* Reflet lumineux stylisé (très simple pour l'instant) */}
         {/* On utilise deux chemins semi-transparents blancs/gris pour simuler le reflet conique */}
-        <Path
-          d={`M ${center} ${center} L ${center - radius * 0.5} 0 A ${radius} ${radius} 0 0 1 ${center + radius * 0.5} 0 Z`}
-          fill="rgba(255,255,255,0.05)"
-        />
-        <Path
-          d={`M ${center} ${center} L ${center - radius * 0.5} ${size} A ${radius} ${radius} 0 0 0 ${center + radius * 0.5} ${size} Z`}
-          fill="rgba(255,255,255,0.05)"
-        />
+        <G clipPath="url(#vinylClip)">
+          <Path
+            d={`M ${center} ${center} L ${center - radius * 0.5} 0 A ${radius} ${radius} 0 0 1 ${center + radius * 0.5} 0 Z`}
+            fill="rgba(255,255,255,0.05)"
+          />
+          <Path
+            d={`M ${center} ${center} L ${center - radius * 0.5} ${size} A ${radius} ${radius} 0 0 0 ${center + radius * 0.5} ${size} Z`}
+            fill="rgba(255,255,255,0.05)"
+          />
+        </G>
 
         {/* Macaron Central (Label) */}
         <Circle cx={center} cy={center} r={radius * 0.35} fill="url(#labelGradient)" />

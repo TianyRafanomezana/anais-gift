@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  withRepeat, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
   Easing,
   cancelAnimation
 } from 'react-native-reanimated';
@@ -30,8 +30,8 @@ export default function VinylPlayer() {
   const handlePress = () => {
     if (!isExtracted) {
       // 1. Sortir le vinyle
-      translateY.value = withTiming(-180, { 
-        duration: 1000, 
+      translateY.value = withTiming(-180, {
+        duration: 1000,
         easing: Easing.bezier(0.25, 0.1, 0.25, 1) // Sortie fluide
       }, (finished) => {
         if (finished) {
@@ -65,7 +65,7 @@ export default function VinylPlayer() {
   return (
     <View style={styles.container}>
       <Pressable onPress={handlePress} style={styles.interactiveArea}>
-        
+
         {/* Le Vinyle Animé (Z-index: 1) */}
         <Animated.View style={[styles.vinylWrapper, animatedVinylStyle]}>
           <VinylRecord size={260} />
