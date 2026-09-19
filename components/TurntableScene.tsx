@@ -1,39 +1,98 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import Animated, { useAnimatedStyle, SharedValue } from 'react-native-reanimated';
+import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
+import Animated, { useAnimatedStyle, SharedValue, interpolate } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
 
 interface TurntableSceneProps {
   armRotation: SharedValue<number>;
+  armLift?: SharedValue<number>;
 }
 
-export default function TurntableScene() {
-  
+export default function TurntableScene({ isPlaying = false }: { isPlaying?: boolean }) {
+
+
 
 
   return (
     <View style={styles.container}>
-      {/* Turntable Base */}
+      {/* Turntable Base (Valise) */}
       <View style={styles.turntableBase}>
+        {/* Tranche du couvercle (vue de dessus) */}
+        <View style={styles.lidEdge}>
+          {/* Loquet supérieur de fermeture avec sa boucle */}
+          <View style={styles.topLatchContainer}>
+            <View style={styles.latchLoop} />
+            <View style={styles.latchBase} />
+          </View>
+        </View>
+
+        {/* Intérieur bois */}
+        <View style={styles.woodDeck}>
+          <Image
+            source={require('../assets/wood_texture_mid.jpg')}
+            style={styles.woodImage}
+            resizeMode="cover"
+          />
+          {/* Léger voile d'ombrage pour le relief */}
+          <View style={styles.woodOverlay} />
+        </View>
+
         {/* Platter Rim (Tranche du plateau pour l'épaisseur 3D) */}
         <View style={styles.platterRim} />
         {/* Platter (Le plateau où le vinyle va atterrir) */}
-        <View style={styles.platter} />
-        
+        <View style={styles.platter}>
+          {/* Support central métallique (Spindle) */}
+          <View style={styles.platterSpindle}>
+            <View style={styles.platterSpindleHighlight} />
+          </View>
+        </View>
+
+        {/* Support plastique noir pour le bras */}
+        <View style={styles.armSupportPanel} />
+
+        {/* Boutons sur la droite, en dessous du bras */}
+        <View style={styles.knobsContainer}>
+          <View style={styles.knob}><View style={styles.knobHighlight} /></View>
+          <View style={styles.knob}><View style={styles.knobHighlight} /></View>
+
+          {/* Voyant LED (allumé si isPlaying) */}
+          <View style={[styles.ledIndicator, isPlaying && styles.ledIndicatorOn]} />
+        </View>
+
+        {/* Éléments avant qui dépassent (poignée, loquets) */}
+        <View style={styles.frontEdge}>
+          <View style={styles.latch} />
+          <View style={styles.handle} />
+          <View style={styles.latch} />
+
+          {/* Bout de métal central (fermoir) aligné avec le haut */}
+          <View style={styles.centerLatch} />
+        </View>
       </View>
     </View>
   );
 }
 
-export function TurntableArmScene({ armRotation }: TurntableSceneProps) {
+export function TurntableArmScene({ armRotation, armLift }: TurntableSceneProps) {
   const animatedArmStyle = useAnimatedStyle(() => {
+    // Si armLift est défini, on interpole de 0 (posé) à 1 (soulevé)
+    const scale = armLift ? interpolate(armLift.value, [0, 1], [1, 1.05]) : 1;
+    const shadowOffset = armLift ? interpolate(armLift.value, [0, 1], [15, 25]) : 15;
+    const shadowOpacity = armLift ? interpolate(armLift.value, [0, 1], [0.6, 0.4]) : 0.6;
+    const translateY = armLift ? interpolate(armLift.value, [0, 1], [0, -5]) : 0;
+
     return {
       transform: [
         { translateY: -90 },
         { rotate: `${armRotation.value}deg` },
         { translateY: 90 },
+        { translateY }, // Effet de recul visuel
+        { scale }, // Effet de zoom
       ],
+      shadowOffset: { width: 5, height: shadowOffset },
+      shadowOpacity,
+      shadowRadius: 10,
     };
   });
 
@@ -41,12 +100,16 @@ export function TurntableArmScene({ armRotation }: TurntableSceneProps) {
     <View style={styles.container}>
       <View style={[styles.turntableBase, styles.transparentBase]}>
         {/* Tonearm Base (Pivot) */}
-        <View style={styles.tonearmBase} />
-        
+        <View style={styles.tonearmBase}>
+          <View style={styles.tonearmBaseCenter} />
+        </View>
+
         {/* Tonearm (Le bras articulé animé) */}
         <Animated.View style={[styles.tonearmWrapper, animatedArmStyle]}>
           <View style={styles.tonearmLine} />
-          <View style={styles.tonearmHead} />
+          <View style={styles.tonearmHead}>
+            <View style={styles.tonearmNeedle} />
+          </View>
         </Animated.View>
       </View>
     </View>
@@ -61,18 +124,210 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   turntableBase: {
-    width: 320,
-    height: 380,
-    backgroundColor: '#2A1A24',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#3f2736',
+    width: 360, // Réduit pour rentrer dans l'écran
+    height: 310, // Réduit pour un format plus rectangulaire
+    backgroundColor: '#814C32', // Cuir marron
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#C0A080', // Surpiqûres
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.6,
     shadowRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+  },
+  woodDeck: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+    right: 15,
+    bottom: 15, // Épouse les bords internes
+    backgroundColor: '#3d2015',
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#26130b',
+    overflow: 'hidden',
+  },
+  woodImage: {
+    position: 'absolute',
+    top: -120,
+    left: -95,
+    width: 520,
+    height: 520,
+    transform: [{ rotate: '30deg' }],
+  },
+  woodOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  lidEdge: {
+    position: 'absolute',
+    top: -55,
+    width: 360, // Réduit
+    height: 55,
+    backgroundColor: '#814C32',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    borderWidth: 2,
+    borderBottomWidth: 0,
+    borderColor: '#C0A080',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    // Ombre portée vers l'intérieur pour donner de la profondeur
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 5,
+    zIndex: 2, // Pour que l'ombre passe au-dessus du cuir et du bois
+  },
+  topLatchContainer: {
+    alignItems: 'center',
+    marginBottom: -2,
+  },
+  latchLoop: {
+    width: 40,
+    height: 30,
+    borderWidth: 5,
+    borderColor: '#D0D0D0', // Boucle métallique
+    borderRadius: 4,
+    backgroundColor: 'transparent', // Trou au milieu
+  },
+  latchBase: {
+    width: 26,
+    height: 15,
+    backgroundColor: '#A0A0A0', // Base fixée
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+    borderWidth: 1,
+    borderColor: '#888',
+    marginTop: -4, // Chevauche la boucle
+  },
+  frontEdge: {
+    position: 'absolute',
+    bottom: -8, // 0 = bord extérieur de la valise. bottom: -8 + height: 8 => top: 0 (colle parfaitement)
+    width: 360,
+    height: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start', // Colle la poignée et les loquets tout en haut, contre la valise
+    gap: 0, // Les éléments se touchent
+    zIndex: 20,
+  },
+  latch: {
+    width: 16,
+    height: 6,
+    backgroundColor: '#C0C0C0',
+    borderRadius: 2,
+    borderWidth: 1,
+    borderColor: '#888',
+    zIndex: 2, // Les fixations métalliques passent par dessus la poignée
+  },
+  centerLatch: {
+    position: 'absolute',
+    left: '50%',
+    marginLeft: -12, // Moitié de la largeur (24)
+    top: 0,
+    width: 24, // Même largeur que le loquet du haut (latchBase)
+    height: 6,
+    backgroundColor: '#C0C0C0',
+    borderRadius: 2,
+    borderWidth: 1,
+    borderColor: '#888',
+    zIndex: 3, // Passe par dessus la poignée
+  },
+  handle: {
+    width: 90,
+    height: 8,
+    backgroundColor: '#6A3B22',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#4A2510',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    marginHorizontal: -4, // Fait chevaucher les bouts métalliques de 4px de chaque côté
+    zIndex: 1,
+  },
+  armSupportPanel: {
+    position: 'absolute',
+    top: 15, // Un peu plus haut
+    right: 20,
+    width: 60,
+    height: 90,
+    backgroundColor: '#151515', // Plastique noir mat
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#222',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    zIndex: 4,
+  },
+  knobsContainer: {
+    position: 'absolute',
+    bottom: 30, // Poussé vers le bas
+    right: 25, // Alignés sur la droite
+    width: 40,
+    alignItems: 'center',
+    gap: 15,
+    zIndex: 5,
+  },
+  smallKnob: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#666',
+    marginBottom: 5,
+  },
+  knob: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#888',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+  },
+  knobHighlight: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#333',
+    borderWidth: 1,
+    borderColor: '#AAA',
+  },
+  ledIndicator: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#444', // Éteint
+    marginTop: 15, // Espacement par rapport aux boutons
+    borderWidth: 1,
+    borderColor: '#222',
+  },
+  ledIndicatorOn: {
+    backgroundColor: '#FF3B30', // Rouge vif
+    borderColor: '#FFA099',
+    shadowColor: '#FF0000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
   },
   transparentBase: {
     backgroundColor: 'transparent',
@@ -81,59 +336,111 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   platterRim: {
-    width: 280,
-    height: 280,
-    borderRadius: 140,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
     backgroundColor: '#333',
     position: 'absolute',
-    top: 36,
+    top: 31,
+    left: 20, // Décalé à gauche
   },
   platter: {
-    width: 280,
-    height: 280,
-    borderRadius: 140,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
     backgroundColor: '#111',
     borderWidth: 4,
     borderColor: '#222',
     position: 'absolute',
-    top: 30,
+    top: 25,
+    left: 20, // Décalé à gauche
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  platterSpindle: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#D0D0D0',
+    borderWidth: 1,
+    borderColor: '#999',
+    shadowColor: '#000',
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  platterSpindleHighlight: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: '#FFF',
+    position: 'absolute',
+    top: 2,
+    left: 2,
   },
   tonearmBase: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#D4AF37',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#111', // Pivot noir
+    borderWidth: 2,
+    borderColor: '#333',
     position: 'absolute',
-    top: 40,
-    right: 20,
+    top: 30, // Un peu remonté pour la nouvelle hauteur
+    right: 28, // Au centre du support noir
     zIndex: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tonearmBaseCenter: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#888', // Centre argenté
   },
   tonearmWrapper: {
     position: 'absolute',
-    top: 60,
-    right: 35,
-    width: 10,
-    height: 200,
+    top: 52, // 30 + 22
+    right: 43, // 28 (pivot) + 22 (rayon) - 7 (demi-bras) = 43
+    width: 14,
+    height: 180,
     zIndex: 11,
     alignItems: 'center',
   },
   tonearmLine: {
-    width: 6,
+    width: 4,
     height: 180,
-    backgroundColor: '#D4AF37',
-    borderRadius: 3,
+    backgroundColor: '#D0D0D0', // Tige métallique argentée
+    borderRadius: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
   },
   tonearmHead: {
-    width: 15,
-    height: 30,
-    backgroundColor: '#222',
+    width: 18,
+    height: 35,
+    backgroundColor: '#111', // Tête noire
     borderWidth: 1,
-    borderColor: '#D4AF37',
-    borderRadius: 2,
+    borderColor: '#333',
+    borderRadius: 4,
     marginTop: -5,
+    alignItems: 'flex-start', // Pour placer l'aiguille rouge sur le côté
+  },
+  tonearmNeedle: {
+    width: 6,
+    height: 10,
+    backgroundColor: '#E53935', // Pointe rouge
+    borderTopRightRadius: 3,
+    borderBottomRightRadius: 3,
+    marginTop: 15,
+    marginLeft: -3, // Dépasse un peu sur la gauche
   }
 });
