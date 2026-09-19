@@ -41,6 +41,7 @@ export default function App() {
     progress,
     formattedCurrentTime,
     formattedDuration,
+    seekToRatio,
   } = useVinylAudio();
 
   // On centre le vinyle et la pochette légèrement au-dessus du milieu de l'écran
@@ -205,7 +206,7 @@ export default function App() {
         armRotation.value = withTiming(15, { duration: 300 });
         armLift.value = withTiming(0, { duration: 300 });
         globalScale.value = withTiming(1, { duration: 300 });
-        globalTranslateY.value = withTiming(0, { duration: 300 });
+        globalTranslateY.value = withTiming(-180, { duration: 300 }); // Remonte beaucoup plus la table pour laisser place au UI en bas
         setAnimationStep(3);
         break;
 
@@ -222,7 +223,7 @@ export default function App() {
         armRotation.value = withTiming(38, { duration: 300 });
         armLift.value = withTiming(0, { duration: 300 });
         globalScale.value = withTiming(1, { duration: 300 });
-        globalTranslateY.value = withTiming(0, { duration: 300 });
+        globalTranslateY.value = withTiming(-180, { duration: 300 }); // Remonte beaucoup plus la table pour laisser place au UI en bas
         vinylRotation.value = withRepeat(
           withTiming(720, { duration: 3000, easing: Easing.linear }),
           -1,
@@ -567,6 +568,8 @@ export default function App() {
           formattedCurrentTime={formattedCurrentTime}
           formattedDuration={formattedDuration}
           isBuffering={isBuffering}
+          onPlayPausePress={handlePress}
+          onSeekRatio={seekToRatio}
         />
       )}
 
