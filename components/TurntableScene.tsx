@@ -124,8 +124,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   turntableBase: {
-    width: 360, // Réduit pour rentrer dans l'écran
-    height: 310, // Réduit pour un format plus rectangulaire
+    width: 340, // Réduit pour un lecteur plus fin et élégant
+    height: 290, // Réduit pour un profil plus fin
     backgroundColor: '#814C32', // Cuir marron
     borderRadius: 30,
     borderWidth: 2,
@@ -140,10 +140,10 @@ const styles = StyleSheet.create({
   },
   woodDeck: {
     position: 'absolute',
-    top: 15,
-    left: 15,
-    right: 15,
-    bottom: 15, // Épouse les bords internes
+    top: 10,
+    left: 12,
+    right: 12,
+    bottom: 10, // Épouse les bords internes
     backgroundColor: '#3d2015',
     borderRadius: 20,
     borderWidth: 1.5,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   lidEdge: {
     position: 'absolute',
     top: -55,
-    width: 360, // Réduit
+    width: 340, // Réduit
     height: 55,
     backgroundColor: '#814C32',
     borderTopLeftRadius: 15,
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   frontEdge: {
     position: 'absolute',
     bottom: -8, // 0 = bord extérieur de la valise. bottom: -8 + height: 8 => top: 0 (colle parfaitement)
-    width: 360,
+    width: 340,
     height: 8,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -258,10 +258,10 @@ const styles = StyleSheet.create({
   },
   armSupportPanel: {
     position: 'absolute',
-    top: 15, // Un peu plus haut
-    right: 20,
-    width: 60,
-    height: 90,
+    top: 12,
+    right: 12,
+    width: 54,
+    height: 85,
     backgroundColor: '#151515', // Plastique noir mat
     borderRadius: 10,
     borderWidth: 1,
@@ -274,8 +274,8 @@ const styles = StyleSheet.create({
   },
   knobsContainer: {
     position: 'absolute',
-    bottom: 30, // Poussé vers le bas
-    right: 25, // Alignés sur la droite
+    bottom: 22, // Légèrement remonté pour la nouvelle hauteur
+    right: 18, // Alignés sur la droite
     width: 40,
     alignItems: 'center',
     gap: 15,
@@ -341,8 +341,8 @@ const styles = StyleSheet.create({
     borderRadius: 130,
     backgroundColor: '#333',
     position: 'absolute',
-    top: 31,
-    left: 20, // Décalé à gauche
+    top: 19,
+    left: 11, // Décalé pour conserver l'alignement vinyle à -29px
   },
   platter: {
     width: 260,
@@ -352,8 +352,8 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: '#222',
     position: 'absolute',
-    top: 25,
-    left: 20, // Décalé à gauche
+    top: 15,
+    left: 11, // Décalé pour conserver l'alignement vinyle à -29px
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -389,8 +389,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#333',
     position: 'absolute',
-    top: 30, // Un peu remonté pour la nouvelle hauteur
-    right: 28, // Au centre du support noir
+    top: 26, // Recentré pour la hauteur 290
+    right: 17, // Au centre du support noir
     zIndex: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
@@ -407,8 +407,8 @@ const styles = StyleSheet.create({
   },
   tonearmWrapper: {
     position: 'absolute',
-    top: 52, // 30 + 22
-    right: 43, // 28 (pivot) + 22 (rayon) - 7 (demi-bras) = 43
+    top: 48, // 26 + 22
+    right: 32, // 17 (pivot) + 22 (rayon) - 7 (demi-bras) = 32
     width: 14,
     height: 180,
     zIndex: 11,

@@ -41,54 +41,25 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     alignSelf: 'center',
   },
-  sleeveFront: {
-    width: 260,
-    height: 260,
-    backgroundColor: '#F7CAD0', // Rose poudré satiné
-    borderRadius: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#D4AF37', // Dorure fine
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 20,
-    // On le décale légèrement vers le haut pour le poser "sur" l'étagère
-    transform: [{ translateY: 5 }],
-  },
-  sleeveText: {
-    color: '#D4AF37',
-    fontSize: 28,
-    fontWeight: 'bold',
-    letterSpacing: 4,
-    textShadowColor: 'rgba(0,0,0,0.1)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  sleeveSubtext: {
-    marginTop: 20,
-    color: '#8c5a61',
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 2,
-  },
   shelfTop: {
     position: 'absolute',
     top: (height / 2) + 80, // Ajusté pour la pochette de taille 240
-    width: width,
+    width: 320,
     height: 15,
     backgroundColor: '#3a1f33', // Bois sombre violacé
     borderTopWidth: 1,
     borderTopColor: '#5c3251',
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
   },
   shelfFront: {
     position: 'absolute',
     top: (height / 2) + 95, // 80 + 15
-    width: width,
+    width: 320,
     height: 25,
     backgroundColor: '#261421', // Tranche de l'étagère plus sombre
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.8,
