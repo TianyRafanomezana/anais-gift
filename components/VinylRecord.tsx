@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Circle, Path, Defs, RadialGradient, Stop, ClipPath, G } from 'react-native-svg';
+import YarnHeart from './YarnHeart';
 
 interface VinylRecordProps {
   size?: number;
@@ -28,11 +29,11 @@ export default function VinylRecord({ size = 300 }: VinylRecordProps) {
             />
           </ClipPath>
 
-          {/* Dégradé pour le macaron central (Or brossé / Rose Gold) */}
+          {/* Dégradé pour le macaron central (Rose Blush comme la pochette) */}
           <RadialGradient id="labelGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-            <Stop offset="0%" stopColor="#FFE6A3" />
-            <Stop offset="70%" stopColor="#D4AF37" />
-            <Stop offset="100%" stopColor="#B8860B" />
+            <Stop offset="0%" stopColor="#FFFFFF" />
+            <Stop offset="70%" stopColor="#F8E3E5" />
+            <Stop offset="100%" stopColor="#E6CED1" />
           </RadialGradient>
 
           {/* Dégradé pour le vinyle noir avec un léger reflet radial */}
@@ -82,23 +83,19 @@ export default function VinylRecord({ size = 300 }: VinylRecordProps) {
           <Circle cx={center} cy={center} r={radius * 0.35} fill="url(#labelGradient)" />
 
           {/* Ligne décorative sur le macaron */}
-          <Circle cx={center} cy={center} r={radius * 0.32} stroke="#B8860B" strokeWidth="1" fill="none" />
+          <Circle cx={center} cy={center} r={radius * 0.32} stroke="#E6CED1" strokeWidth="1" fill="none" />
 
-          {/* Logo Cœur (Minimaliste au centre) */}
-          <Path
-            d={`M ${center} ${center + 5} 
-                C ${center} ${center + 5}, ${center - 15} ${center - 5}, ${center - 15} ${center - 15} 
-                C ${center - 15} ${center - 25}, ${center - 5} ${center - 25}, ${center} ${center - 15} 
-                C ${center + 5} ${center - 25}, ${center + 15} ${center - 25}, ${center + 15} ${center - 15} 
-                C ${center + 15} ${center - 5}, ${center} ${center + 5}, ${center} ${center + 5} Z`}
-            fill="#180917" /* Rose très sombre / Prune */
-          />
 
           {/* Ombre/profondeur du trou (pour donner du relief) */}
           <Circle cx={center} cy={center} r={radius * 0.04} fill="#111" />
           {/* L'axe métallique est maintenant physiquement sur la platine et passera à travers le trou transparent ! */}
         </G>
       </Svg>
+
+      {/* Véritable coeur en fil de laine posé physiquement sur le macaron ! */}
+      <View style={styles.heartOverlay}>
+        <YarnHeart size={size * 0.3} />
+      </View>
     </View>
   );
 }
@@ -107,11 +104,12 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    // Ajout d'une ombre subtile pour donner du relief au disque
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 10,
   },
+  heartOverlay: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  }
 });

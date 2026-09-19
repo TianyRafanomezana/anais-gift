@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 interface PlayerOverlayProps {
   isPlaying: boolean;
@@ -21,13 +22,21 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
   return (
     <View style={styles.container} pointerEvents="none">
       <View style={styles.card}>
-        {/* En-tête : Titre & Badge d'état */}
+        {/* En-tête : Titre & Icône d'état */}
         <View style={styles.header}>
           <Text style={styles.title}>Le Vinyle d'Anaïs</Text>
-          <View style={[styles.badge, isPlaying ? styles.badgePlaying : styles.badgePaused]}>
-            <Text style={styles.badgeText}>
-              {isBuffering ? 'CHARGEMENT...' : isPlaying ? '▶ EN LECTURE' : '⏸ EN PAUSE'}
-            </Text>
+          <View style={styles.playPauseIcon}>
+            {isPlaying ? (
+              // Icône Pause (élégante et fine)
+              <Svg width={22} height={22} viewBox="0 0 24 24">
+                <Path d="M8 5h2v14H8zm6 0h2v14h-2z" fill="#D4AF37" />
+              </Svg>
+            ) : (
+              // Icône Play
+              <Svg width={22} height={22} viewBox="0 0 24 24">
+                <Path d="M8 5v14l11-7z" fill="#D4AF37" />
+              </Svg>
+            )}
           </View>
         </View>
 
@@ -41,11 +50,6 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
           <Text style={styles.timeText}>{formattedCurrentTime}</Text>
           <Text style={styles.timeText}>{formattedDuration}</Text>
         </View>
-
-        {/* Invitation discrète */}
-        <Text style={styles.hintText}>
-          {isPlaying ? 'Touche l\'écran pour mettre en pause' : 'Touche l\'écran pour reprendre l\'écoute'}
-        </Text>
       </View>
     </View>
   );
@@ -88,25 +92,15 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
+  playPauseIcon: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(212, 175, 55, 0.1)',
     borderWidth: 1,
-  },
-  badgePlaying: {
-    backgroundColor: 'rgba(212, 175, 55, 0.15)',
-    borderColor: '#D4AF37',
-  },
-  badgePaused: {
-    backgroundColor: 'rgba(247, 202, 208, 0.1)',
-    borderColor: 'rgba(247, 202, 208, 0.4)',
-  },
-  badgeText: {
-    color: '#F7CAD0',
-    fontSize: 10,
-    fontWeight: 'bold',
-    letterSpacing: 1.2,
+    borderColor: 'rgba(212, 175, 55, 0.3)',
   },
   progressTrack: {
     height: 4,
@@ -130,13 +124,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '500',
     fontVariant: ['tabular-nums'],
-  },
-  hintText: {
-    marginTop: 8,
-    color: 'rgba(212, 175, 55, 0.75)',
-    fontSize: 11,
-    textAlign: 'center',
-    letterSpacing: 0.5,
   },
 });
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, StyleSheet, Text, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -9,7 +8,7 @@ export default function ShelfScene() {
       <View style={styles.wall}>
         <Text style={styles.instructionText}>🎧 Installe-toi au calme...</Text>
       </View>
-      
+
       {/* L'étagère */}
       <View style={styles.shelfTop} />
       <View style={styles.shelfFront} />
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
   instructionText: {
     position: 'absolute',
     top: (height / 2) - 250,
-    color: '#F7CAD0',
+    color: '#F7CAD0', // Rose clair lisible sur le mur velours bordeaux
     fontSize: 16,
     fontWeight: '500',
     letterSpacing: 1,
@@ -46,9 +45,9 @@ const styles = StyleSheet.create({
     top: (height / 2) + 80, // Ajusté pour la pochette de taille 240
     width: 320,
     height: 15,
-    backgroundColor: '#3a1f33', // Bois sombre violacé
+    backgroundColor: '#4A1525', // Velours bordeaux
     borderTopWidth: 1,
-    borderTopColor: '#5c3251',
+    borderTopColor: '#5C1D30',
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
   },
@@ -57,7 +56,7 @@ const styles = StyleSheet.create({
     top: (height / 2) + 95, // 80 + 15
     width: 320,
     height: 25,
-    backgroundColor: '#261421', // Tranche de l'étagère plus sombre
+    backgroundColor: '#2D0D17', // Tranche plus sombre
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
     shadowColor: '#000',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Dimensions, SafeAreaView, Pressable, Text, View } from 'react-native';
+import { StyleSheet, Dimensions, SafeAreaView, Pressable, Text, View, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Animated, {
   useSharedValue,
@@ -17,13 +17,17 @@ import ShelfScene from './components/ShelfScene';
 import TurntableScene, { TurntableArmScene } from './components/TurntableScene';
 import VinylRecord from './components/VinylRecord';
 import PlayerOverlay from './components/PlayerOverlay';
-import YarnHeart from './components/YarnHeart';
 import WallPattern from './components/WallPattern';
 import { useVinylAudio } from './hooks/useVinylAudio';
+import { useFonts, PinyonScript_400Regular } from '@expo-google-fonts/pinyon-script';
 
 const { height, width } = Dimensions.get('window');
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    PinyonScript_400Regular,
+  });
+
   const [animationStep, setAnimationStep] = useState(-1);
   const playTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -57,6 +61,9 @@ export default function App() {
   const globalScale = useSharedValue(4.5); // Zoom global suffisant pour cacher les bords
   const globalTranslateY = useSharedValue(180); // Pour recentrer la pochette (40 * 4.5 = 180)
 
+  const textOpacity = useSharedValue(0);
+  const textTranslateY = useSharedValue(10);
+
   // Position initiale du vinyle (centré pile derrière la pochette)
   const vinylY = useSharedValue(INITIAL_Y);
   const vinylRotation = useSharedValue(0);
@@ -82,6 +89,10 @@ export default function App() {
   // Transition automatique de l'écran de chargement (-1) à l'étagère (0)
   useEffect(() => {
     if (animationStep === -1) {
+      // Lance l'apparition du texte juste avant la fin du dessin du coeur (à 3s)
+      textOpacity.value = withDelay(3000, withTiming(1, { duration: 1500, easing: Easing.out(Easing.ease) }));
+      textTranslateY.value = withDelay(3000, withTiming(0, { duration: 1500, easing: Easing.out(Easing.ease) }));
+
       // L'animation du coeur prend environ 3.5s (500ms délai + 3000ms tracé)
       const timer = setTimeout(() => {
         goToStep(0);
@@ -116,6 +127,8 @@ export default function App() {
         armLift.value = withTiming(0, { duration: 300 });
         globalScale.value = withTiming(4.5, { duration: 300 }); // Repasse en plein écran
         globalTranslateY.value = withTiming(180, { duration: 300 });
+        textOpacity.value = withTiming(0, { duration: 300 });
+        textTranslateY.value = withTiming(10, { duration: 300 });
         setAnimationStep(-1);
         break;
 
@@ -361,8 +374,14 @@ export default function App() {
   });
 
   const animatedFloorStyle = useAnimatedStyle(() => {
+    const translatedFloor = interpolate(
+      floorY.value,
+      [0, -height],
+      [0, -height + 150], // Le sol s'arrête 150px avant le haut
+      Extrapolation.CLAMP
+    );
     return {
-      transform: [{ translateY: floorY.value }],
+      transform: [{ translateY: translatedFloor }],
     };
   });
 
@@ -372,6 +391,21 @@ export default function App() {
         { translateY: globalTranslateY.value },
         { scale: globalScale.value }
       ],
+    };
+  });
+
+  const animatedHeartStyle = useAnimatedStyle(() => {
+    // Effet "Dolly Zoom" (Vertigo) : le coeur compense le zoom global
+    // À globalScale = 1 (sur l'étagère), le coeur est à taille normale (1)
+    // À globalScale = 4.5 (intro), le coeur est réduit (0.64) pour ne pas être trop gros à l'écran
+    const heartScale = interpolate(
+      globalScale.value,
+      [1, 4.5],
+      [1, 0.64],
+      Extrapolation.CLAMP
+    );
+    return {
+      transform: [{ scale: heartScale }]
     };
   });
 
@@ -398,6 +432,13 @@ export default function App() {
     };
   });
 
+  const animatedTextStyle = useAnimatedStyle(() => {
+    return {
+      opacity: textOpacity.value,
+      transform: [{ translateY: textTranslateY.value }],
+    };
+  });
+
   const animatedVinylStyle = useAnimatedStyle(() => ({
     zIndex: vinylZIndex.value,
     transform: [
@@ -409,6 +450,10 @@ export default function App() {
       { scale: vinylScale.value }
     ],
   }));
+
+  if (!fontsLoaded) {
+    return null; // Affiche un écran vide en attendant le chargement de la typo
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -462,37 +507,52 @@ export default function App() {
               </Animated.View>
             </Animated.View>
 
-          {/* COUCHE 1 : DÉCOR ARRIÈRE (Étagère) */}
-          <Animated.View style={[styles.layer, animatedShelfStyle]}>
-            <ShelfScene />
-          </Animated.View>
+            {/* COUCHE 1 : DÉCOR ARRIÈRE (Étagère) */}
+            <Animated.View style={[styles.layer, animatedShelfStyle]}>
+              <ShelfScene />
+            </Animated.View>
 
-          {/* COUCHE 1.2 : LE SOL ET LA TABLE (Qui montent ensemble) */}
-          <Animated.View style={[styles.floorLayer, animatedFloorStyle]} pointerEvents="none">
-            {/* La table plate 2D, ancrée en haut du sol */}
-            <View style={styles.flatTable} />
-          </Animated.View>
+            {/* COUCHE 1.2 : LE SOL ET LA TABLE (Qui montent ensemble) */}
+            <Animated.View style={[styles.floorLayer, animatedFloorStyle]} pointerEvents="none">
+              {/* La table plate 2D, ancrée en haut du sol */}
+              <View style={[styles.flatTable, { overflow: 'hidden' }]}>
+                <Image source={require('./assets/marble.jpg')} style={StyleSheet.absoluteFill} resizeMode="cover" />
+              </View>
+            </Animated.View>
 
-          {/* COUCHE 1.5 : DÉCOR ARRIÈRE (Platine) */}
-          <Animated.View style={[styles.layer, animatedTurntableStyle, { zIndex: 3 }]} pointerEvents="none">
-            <TurntableScene isPlaying={isPlaying} />
-          </Animated.View>
+            {/* COUCHE 1.5 : DÉCOR ARRIÈRE (Platine) */}
+            <Animated.View style={[styles.layer, animatedTurntableStyle, { zIndex: 3 }]} pointerEvents="none">
+              <TurntableScene isPlaying={isPlaying} />
+            </Animated.View>
 
-          {/* COUCHE 2 : L'ACTEUR PRINCIPAL (Le Vinyle) */}
-          <Animated.View style={[styles.vinylLayer, animatedVinylStyle]} pointerEvents="none">
-            <VinylRecord size={240} />
-          </Animated.View>
+            {/* COUCHE 2 : L'ACTEUR PRINCIPAL (Le Vinyle) */}
+            <Animated.View style={[styles.vinylLayer, animatedVinylStyle]} pointerEvents="none">
+              <VinylRecord size={240} />
+            </Animated.View>
 
-          {/* COUCHE 2.5 : LE BRAS DE LA PLATINE (Au-dessus du vinyle une fois posé) */}
-          <Animated.View style={[styles.layer, animatedTurntableStyle, { zIndex: 6 }]} pointerEvents="none">
-            <TurntableArmScene armRotation={armRotation} armLift={armLift} />
-          </Animated.View>
+            {/* COUCHE 2.5 : LE BRAS DE LA PLATINE (Au-dessus du vinyle une fois posé) */}
+            <Animated.View style={[styles.layer, animatedTurntableStyle, { zIndex: 6 }]} pointerEvents="none">
+              <TurntableArmScene armRotation={armRotation} armLift={armLift} />
+            </Animated.View>
 
             {/* COUCHE 3 : DÉCOR AVANT (La Pochette) */}
             <Animated.View style={[styles.layer, animatedShelfStyle, { zIndex: 20 }]} pointerEvents="box-none">
               <View style={styles.sleeveFront}>
-                {/* Le coeur en fil de laine rouge - plus petit pour compenser le gros zoom */}
-              <YarnHeart size={90} />
+                {/* Cadre intérieur délicat (style carte d'invitation de luxe) */}
+                <View style={styles.sleeveInnerFrame} />
+
+                {/* Le texte central compensant le dézoom global */}
+                <Animated.View style={[animatedHeartStyle, styles.sleeveGraphic]}>
+                  <Animated.Text style={[styles.sleeveTopText, animatedTextStyle]}>
+                    A gift for you
+                  </Animated.Text>
+                  <Animated.Text style={[styles.sleeveTitle, animatedTextStyle]}>
+                    My Prayer{'\n'}for your heart
+                  </Animated.Text>
+                  <Animated.Text style={[styles.sleeveSubtitle, animatedTextStyle]}>
+                    Anaïs's 20th
+                  </Animated.Text>
+                </Animated.View>
               </View>
             </Animated.View>
           </Animated.View>
@@ -562,7 +622,7 @@ const styles = StyleSheet.create({
     top: 0, // Collé parfaitement à la ligne d'horizon !
     width: 600, // Largeur du bureau
     height: height - 300, // S'arrête avant le bas de l'écran pour voir le sol
-    backgroundColor: '#6B4226', // Bois
+    backgroundColor: '#FCFAFA', // Marbre Blanc
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     shadowColor: '#000',
@@ -578,18 +638,72 @@ const styles = StyleSheet.create({
   },
   sleeveFront: {
     position: 'absolute',
-    // La pochette est fixée à INITIAL_Y
     top: (height / 2) - 160,
     alignSelf: 'center',
     width: 240,
     height: 240,
-    backgroundColor: '#F7CAD0', // Rose poudré satiné
+    backgroundColor: '#F8E3E5', // Rose Blush très doux et élégant
     borderRadius: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#D4AF37', // Dorure fine
-    zIndex: 10, // Toujours au-dessus du vinyle
+    // Ombre interne / Épaisseur en bas pour simuler l'inclinaison (le bas repose, le haut est penché)
+    borderBottomWidth: 4,
+    borderBottomColor: '#E8D0D4', // Un blush légèrement ombré
+    // Ombre de la pochette sur l'étagère
+    shadowColor: '#4A252A', // Ombre légèrement teintée pour plus de chaleur
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 10,
+    zIndex: 10,
+    overflow: 'hidden',
+  },
+  sleeveRingWear: {
+    position: 'absolute',
+    width: 232,
+    height: 232,
+    borderRadius: 116,
+    borderWidth: 1,
+    borderColor: 'rgba(92, 42, 51, 0.05)', // Empreinte circulaire bordeaux très subtile
+  },
+  sleeveInnerFrame: {
+    position: 'absolute',
+    top: 12,
+    bottom: 12,
+    left: 12,
+    right: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(92, 42, 51, 0.15)', // Ligne bordeaux très fine et subtile
+  },
+  sleeveGraphic: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  sleeveTopText: {
+    position: 'absolute',
+    top: -40, // Symétrie parfaite avec le texte du bas
+    fontSize: 9,
+    color: '#9E6C75', // Bordeaux adouci (rose poudré sombre)
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+  },
+  sleeveTitle: {
+    fontFamily: 'PinyonScript_400Regular',
+    fontSize: 38, // Légèrement plus petit pour plus de délicatesse
+    color: '#5C2A33', // Bordeaux profond et romantique (classy)
+    textAlign: 'center',
+    lineHeight: 40,
+  },
+  sleeveSubtitle: {
+    position: 'absolute',
+    bottom: -40, // Symétrie parfaite avec le texte du haut
+    fontSize: 9,
+    color: '#9E6C75',
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    textAlign: 'center',
   },
   sleeveText: {
     color: '#D4AF37',

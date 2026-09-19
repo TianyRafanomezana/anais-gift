@@ -20,7 +20,7 @@ interface YarnHeartProps {
 export default function YarnHeart({ size = 150 }: YarnHeartProps) {
   // Longueur estimée du chemin SVG (il vaut mieux prévoir large pour cacher tout le trait au départ)
   const PATH_LENGTH = 450;
-  
+
   const dashOffset = useSharedValue(PATH_LENGTH);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function YarnHeart({ size = 150 }: YarnHeartProps) {
              C 95,20 90,60 50,80 
              C 65,85 75,95 75,115"
           fill="none"
-          stroke="#b71c1c" // Rouge foncé (ombre du fil)
+          stroke="#3E1C22" // Ombre du fil (Bordeaux très sombre)
           strokeWidth="5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -89,7 +89,7 @@ export default function YarnHeart({ size = 150 }: YarnHeartProps) {
              C 95,20 90,60 50,80 
              C 65,85 75,95 75,115"
           fill="none"
-          stroke="#ff5252" // Rouge vif (lumière)
+          stroke="#5C2A33" // Couleur principale de la typo (Bordeaux/Violet)
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
