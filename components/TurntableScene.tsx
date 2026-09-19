@@ -18,8 +18,6 @@ export default function TurntableScene({ isPlaying = false }: { isPlaying?: bool
     <View style={styles.container}>
       {/* Turntable Base (Valise) */}
       <View style={styles.turntableBase}>
-        {/* Reflet laqué brillant diagonal */}
-        <View style={styles.lacquerShine} pointerEvents="none" />
         {/* Tranche du couvercle (vue de dessus) */}
         <View style={styles.lidEdge}>
           {/* Loquet supérieur de fermeture avec sa boucle */}
@@ -128,29 +126,18 @@ const styles = StyleSheet.create({
   turntableBase: {
     width: 340,
     height: 290,
-    backgroundColor: '#5C0D20', // Laque Rouge Carmin / Rubis
+    backgroundColor: '#4A0E1C', // Laque Bordeaux profond
     borderRadius: 30,
     borderWidth: 2,
-    borderColor: '#D4AF37', // Liseré Or précieux
+    borderColor: '#2D0811', // Bords très sombres
 
-    shadowColor: '#30040D', // Ombre bordeaux chaleureuse sur le marbre
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.65,
-    shadowRadius: 25,
+    shadowOpacity: 0.6,
+    shadowRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-  },
-  lacquerShine: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '45%',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    zIndex: 1,
   },
   woodDeck: {
     position: 'absolute',
@@ -158,10 +145,10 @@ const styles = StyleSheet.create({
     left: 12,
     right: 12,
     bottom: 10,
-    backgroundColor: '#2A050E', // Intérieur laque très sombre
+    backgroundColor: '#2D0811', // Intérieur laque sombre
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: 'rgba(212, 175, 55, 0.4)', // Fin filet d'or intérieur
+    borderColor: '#1A0409',
     overflow: 'hidden',
   },
   woodImage: {
@@ -186,12 +173,12 @@ const styles = StyleSheet.create({
     top: -55,
     width: 340,
     height: 55,
-    backgroundColor: '#5C0D20', // Laque Rouge Carmin
+    backgroundColor: '#4A0E1C', // Laque Bordeaux
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     borderWidth: 2,
     borderBottomWidth: 0,
-    borderColor: '#D4AF37', // Filet Or
+    borderColor: '#2D0811',
     alignItems: 'center',
     justifyContent: 'flex-end',
     // Ombre portée vers l'intérieur pour donner de la profondeur
@@ -260,10 +247,10 @@ const styles = StyleSheet.create({
   handle: {
     width: 90,
     height: 8,
-    backgroundColor: '#1E040A', // Cuir bordeaux très sombre
+    backgroundColor: '#1A0409', // Cuir bordeaux très sombre/noir
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.6)', // Surpiqûre or
+    borderColor: '#000000',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
@@ -277,10 +264,10 @@ const styles = StyleSheet.create({
     right: 12,
     width: 54,
     height: 85,
-    backgroundColor: '#2A050E', // Support laque sombre
+    backgroundColor: '#2D0811', // Support laque sombre
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.5)',
+    borderColor: '#1A0409',
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.8,
@@ -401,9 +388,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#5C0D20', // Pivot Rubis
+    backgroundColor: '#4A0E1C', // Pivot Bordeaux
     borderWidth: 2,
-    borderColor: '#D4AF37',
+    borderColor: '#2D0811',
     position: 'absolute',
     top: 26, // Recentré pour la hauteur 290
     right: 17, // Au centre du support noir
@@ -443,7 +430,7 @@ const styles = StyleSheet.create({
   tonearmHead: {
     width: 18,
     height: 35,
-    backgroundColor: '#5C0D20', // Tête Rubis
+    backgroundColor: '#4A0E1C', // Tête Bordeaux
     borderWidth: 1,
     borderColor: '#D4AF37', // Bordure or
     borderRadius: 4,
