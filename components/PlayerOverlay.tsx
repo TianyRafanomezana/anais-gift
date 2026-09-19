@@ -27,7 +27,9 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
 
   const handleSeek = useCallback((evt: any) => {
     if (!onSeekRatio) return;
-    const clickX = evt.nativeEvent.locationX;
+    const nativeEvent = evt.nativeEvent;
+    const clickX = nativeEvent.locationX ?? nativeEvent.offsetX ?? 0;
+    if (typeof clickX !== 'number' || isNaN(clickX)) return;
     const ratio = Math.max(0, Math.min(1, clickX / trackWidthRef.current));
     onSeekRatio(ratio);
   }, [onSeekRatio]);
