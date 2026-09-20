@@ -73,23 +73,30 @@ const CardItem = ({
 
   // Animation d'ouverture/fermeture (sortie de la boîte)
   useEffect(() => {
+    // Courbe de type "Apple" très douce (ease-out-quint/expo)
+    const smoothEasing = Easing.bezier(0.16, 1, 0.3, 1);
+    
     if (isOpen) {
-      // Sortie avec délai selon l'index
-      emergeProgress.value = withDelay(index * 150, withTiming(1, { duration: 400, easing: Easing.out(Easing.quad) }));
-      flyProgress.value = withDelay(index * 150 + 300, withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) }));
+      // Sortie avec délai selon l'index. Ultra lent et cotonneux
+      emergeProgress.value = withDelay(index * 400, withTiming(1, { duration: 1500, easing: smoothEasing }));
+      flyProgress.value = withDelay(index * 400 + 700, withTiming(1, { duration: 1800, easing: smoothEasing }));
     } else {
-      // Retour : on replie d'abord (flyProgress) puis on rentre (emergeProgress)
-      flyProgress.value = withTiming(0, { duration: 300, easing: Easing.in(Easing.quad) });
-      emergeProgress.value = withDelay(250, withTiming(0, { duration: 300, easing: Easing.inOut(Easing.quad) }));
+      // Retour fluide
+      flyProgress.value = withTiming(0, { duration: 800, easing: Easing.inOut(Easing.cubic) });
+      emergeProgress.value = withDelay(400, withTiming(0, { duration: 800, easing: Easing.inOut(Easing.cubic) }));
     }
   }, [isOpen]);
 
   useEffect(() => {
-    positionProgress.value = withTiming(isSelected ? 1 : 0, { duration: 500, easing: Easing.inOut(Easing.cubic) });
+    // Zoom/Focus d'une carte très fluide
+    const smoothEasing = Easing.bezier(0.16, 1, 0.3, 1);
+    positionProgress.value = withTiming(isSelected ? 1 : 0, { duration: 1200, easing: smoothEasing });
   }, [isSelected]);
 
   useEffect(() => {
-    flipProgress.value = withTiming(isFlipped && isSelected ? 1 : 0, { duration: 600, easing: Easing.inOut(Easing.cubic) });
+    // Retournement ultra doux
+    const smoothEasing = Easing.bezier(0.16, 1, 0.3, 1);
+    flipProgress.value = withTiming(isFlipped && isSelected ? 1 : 0, { duration: 1200, easing: smoothEasing });
   }, [isFlipped, isSelected]);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -203,13 +210,14 @@ export default function PhysicalCards({ isOpen }: PhysicalCardsProps) {
   const [isEmerged, setIsEmerged] = useState(false);
 
   useEffect(() => {
+    const smoothEasing = Easing.bezier(0.16, 1, 0.3, 1);
     if (isOpen) {
-      blackProgress.value = withDelay(300, withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) }));
-      // Passe au premier plan à la fin de la sortie initiale
-      setTimeout(() => setIsEmerged(true), 250);
+      // Assombrissement progressif et long
+      blackProgress.value = withDelay(800, withTiming(1, { duration: 2000, easing: smoothEasing }));
+      // On passe la couche au premier plan un peu plus tard vu que c'est plus lent
+      setTimeout(() => setIsEmerged(true), 600);
     } else {
-      blackProgress.value = withTiming(0, { duration: 300, easing: Easing.in(Easing.quad) });
-      // Repasse immédiatement en arrière-plan pour plonger derrière la boîte
+      blackProgress.value = withTiming(0, { duration: 800, easing: Easing.out(Easing.cubic) });
       setIsEmerged(false);
     }
   }, [isOpen]);

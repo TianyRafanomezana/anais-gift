@@ -1,19 +1,19 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { Platform } from 'react-native';
-import { 
-  useAudioPlayer, 
-  useAudioPlayerStatus, 
+import {
+  useAudioPlayer,
+  useAudioPlayerStatus,
   setAudioModeAsync,
   AudioSource
 } from 'expo-audio';
 
-// Source audio par défaut (fichier déposé par l'utilisateur)
-const DEFAULT_AUDIO_SOURCE = require('../assets/audio/impro piano.m4a');
+export const VINYL_TRACKS = [
+  { id: 1, title: 'Prayer to you', source: require('../assets/audio/impro piano.m4a') },
+  { id: 2, title: 'Inspiration memories', source: require('../assets/audio/audio-anais.mp4') },
+];
 
 export interface VinylAudioOptions {
-  source?: AudioSource;
   updateInterval?: number; // en millisecondes, ex: 250
-  autoPlay?: boolean;
 }
 
 export function formatTime(seconds: number = 0): string {
@@ -30,12 +30,13 @@ export function formatTime(seconds: number = 0): string {
  */
 export function useVinylAudio(options: VinylAudioOptions = {}) {
   const {
-    source = DEFAULT_AUDIO_SOURCE,
     updateInterval = 250,
   } = options;
 
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+
   // Initialisation du player expo-audio avec intervalle de mise à jour optimisé
-  const player = useAudioPlayer(source, { updateInterval });
+  const player = useAudioPlayer(VINYL_TRACKS[0].source, { updateInterval });
   const status = useAudioPlayerStatus(player);
 
   // Configuration du mode audio (mode silencieux supporté sur iOS)
@@ -97,14 +98,33 @@ export function useVinylAudio(options: VinylAudioOptions = {}) {
     play();
   }, [seekTo, play]);
 
+  const setTrack = useCallback((index: number) => {
+    if (index >= 0 && index < VINYL_TRACKS.length) {
+      const wasPlaying = status.playing;
+      setCurrentTrackIndex(index);
+      player.replace(VINYL_TRACKS[index].source);
+      if (wasPlaying) {
+        setTimeout(() => player.play(), 50);
+      }
+    }
+  }, [player, status.playing]);
+
+  const nextTrack = useCallback(() => {
+    setTrack((currentTrackIndex + 1) % VINYL_TRACKS.length);
+  }, [currentTrackIndex, setTrack]);
+
+  const prevTrack = useCallback(() => {
+    setTrack((currentTrackIndex - 1 + VINYL_TRACKS.length) % VINYL_TRACKS.length);
+  }, [currentTrackIndex, setTrack]);
+
   // Support Media Session API sur le Web et mobile PWA
   useEffect(() => {
     if (Platform.OS === 'web' && typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
       try {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: "Le Vinyle d'Anaïs",
+          title: VINYL_TRACKS[currentTrackIndex].title,
           artist: "Pour Anaïs",
-          album: "Édition Collector",
+          album: "Le Vinyle d'Anaïs",
         });
 
         navigator.mediaSession.setActionHandler('play', () => play());
@@ -114,26 +134,28 @@ export function useVinylAudio(options: VinylAudioOptions = {}) {
             seekTo(details.seekTime);
           }
         });
+        navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+        navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
       } catch {
         // Silencieux si MediaMetadata non supporté
       }
     }
-  }, [play, pause, seekTo]);
+  }, [play, pause, seekTo, nextTrack, prevTrack, currentTrackIndex]);
 
   // Support Lockscreen natif (Android / iOS via expo-audio)
   useEffect(() => {
     if (status.isLoaded && player.setActiveForLockScreen) {
       try {
         player.setActiveForLockScreen(true, {
-          title: "Le Vinyle d'Anaïs",
+          title: VINYL_TRACKS[currentTrackIndex].title,
           artist: "Pour Anaïs",
-          albumTitle: "Édition Collector",
+          albumTitle: "Le Vinyle d'Anaïs",
         });
       } catch {
         // Silencieux si non supporté sur la plateforme actuelle
       }
     }
-  }, [status.isLoaded, player]);
+  }, [status.isLoaded, player, currentTrackIndex]);
 
   // Calculs mémoïsés pour éviter re-rendus inutiles
   const currentTime = status.currentTime ?? 0;
@@ -164,6 +186,11 @@ export function useVinylAudio(options: VinylAudioOptions = {}) {
     seekTo,
     seekToRatio,
     replay,
+    nextTrack,
+    prevTrack,
+    currentTrackIndex,
+    totalTracks: VINYL_TRACKS.length,
+    currentTrackTitle: VINYL_TRACKS[currentTrackIndex].title,
   };
 }
 

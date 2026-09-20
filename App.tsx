@@ -45,6 +45,11 @@ export default function App() {
     formattedCurrentTime,
     formattedDuration,
     seekToRatio,
+    nextTrack,
+    prevTrack,
+    currentTrackIndex,
+    totalTracks,
+    currentTrackTitle,
   } = useVinylAudio();
 
   // On centre le vinyle et la pochette légèrement au-dessus du milieu de l'écran
@@ -562,8 +567,14 @@ export default function App() {
             </Animated.View>
 
             {/* COUCHE 1.5 : DÉCOR ARRIÈRE (Platine) */}
-            <Animated.View style={[styles.layer, animatedTurntableStyle, { zIndex: 3 }]} pointerEvents="none">
-              <TurntableScene isPlaying={isPlaying} />
+            <Animated.View
+              style={[styles.layer, animatedTurntableStyle, { zIndex: 3 }]}
+              pointerEvents={animationStep === 4 ? 'box-none' : 'none'}
+            >
+              <TurntableScene
+                isPlaying={isPlaying}
+                onPress={animationStep === 4 ? handlePress : undefined}
+              />
             </Animated.View>
 
             {/* COUCHE 2 : L'ACTEUR PRINCIPAL (Le Vinyle) */}
@@ -610,6 +621,11 @@ export default function App() {
           isBuffering={isBuffering}
           onPlayPausePress={handlePress}
           onSeekRatio={seekToRatio}
+          onNextTrack={nextTrack}
+          onPrevTrack={prevTrack}
+          currentTrackIndex={currentTrackIndex}
+          totalTracks={totalTracks}
+          currentTrackTitle={currentTrackTitle}
         />
       )}
 
@@ -905,7 +921,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    backdropFilter: 'blur(4px)',
   },
   primaryBtnText: {
     color: '#FDFBF7',
@@ -932,7 +947,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    backdropFilter: 'blur(4px)',
   },
   nextButtonText: {
     color: '#FDFBF7',

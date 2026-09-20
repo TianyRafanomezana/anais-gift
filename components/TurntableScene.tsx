@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Image, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, SharedValue, interpolate } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
@@ -9,15 +9,20 @@ interface TurntableSceneProps {
   armLift?: SharedValue<number>;
 }
 
-export default function TurntableScene({ isPlaying = false }: { isPlaying?: boolean }) {
+interface TurntableBaseProps {
+  isPlaying?: boolean;
+  onPress?: () => void;
+}
 
-
-
-
+export default function TurntableScene({ isPlaying = false, onPress }: TurntableBaseProps) {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} pointerEvents="box-none">
       {/* Turntable Base (Valise) */}
-      <View style={styles.turntableBase}>
+      <Pressable
+        style={styles.turntableBase}
+        onPress={onPress}
+        disabled={!onPress}
+      >
         {/* Tranche du couvercle (vue de dessus) */}
         <View style={styles.lidEdge}>
           {/* Loquet supérieur de fermeture avec sa boucle */}
@@ -69,7 +74,7 @@ export default function TurntableScene({ isPlaying = false }: { isPlaying?: bool
           {/* Bout de métal central (fermoir) aligné avec le haut */}
           <View style={styles.centerLatch} />
         </View>
-      </View>
+      </Pressable>
     </View>
   );
 }

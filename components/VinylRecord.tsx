@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import Svg, { Circle, Path, Defs, RadialGradient, Stop, ClipPath, G } from 'react-native-svg';
-import YarnHeart from './YarnHeart';
 
 interface VinylRecordProps {
   size?: number;
@@ -10,6 +9,7 @@ interface VinylRecordProps {
 export default function VinylRecord({ size = 300 }: VinylRecordProps) {
   const center = size / 2;
   const radius = size / 2;
+  const labelSize = size * 0.35; // Le macaron fait 35% du rayon, donc 35% de la taille totale en diamètre
 
   return (
     <View style={[styles.container, { width: size, height: size, borderRadius: size / 2 }]}>
@@ -92,9 +92,25 @@ export default function VinylRecord({ size = 300 }: VinylRecordProps) {
         </G>
       </Svg>
 
-      {/* Véritable coeur en fil de laine posé physiquement sur le macaron ! */}
-      <View style={styles.heartOverlay}>
-        <YarnHeart size={size * 0.3} />
+      {/* Macaron texte et relief façon vrai vinyle */}
+      <View style={[styles.labelOverlay, { width: labelSize, height: labelSize, borderRadius: labelSize / 2, left: center - labelSize / 2, top: center - labelSize / 2 }]}>
+        {/* Textes du macaron */}
+        <View style={styles.labelTopSection}>
+          <Text style={styles.labelTitle}>Prayer to</Text>
+        </View>
+
+        <View style={styles.labelMiddleSection}>
+          <Text style={styles.labelSpeed}>Anais</Text>
+          <View style={{ width: 25 }} />
+          <Text style={styles.labelSpeed}>RMD</Text>
+        </View>
+
+        <View style={styles.labelBottomSection}>
+          <Text style={styles.labelTitle}>My sister</Text>
+        </View>
+
+        {/* Centre (trou du vinyle) */}
+        <View style={styles.centerHole} />
       </View>
     </View>
   );
@@ -105,11 +121,61 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  heartOverlay: {
+  labelOverlay: {
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'transparent',
+    overflow: 'hidden',
+  },
+
+  labelTopSection: {
+    position: 'absolute',
+    top: 15,
     width: '100%',
-    height: '100%',
-  }
+    alignItems: 'center',
+  },
+  labelTitle: {
+    fontFamily: 'PinyonScript_400Regular',
+    fontSize: 18,
+    color: '#4A1525',
+  },
+  labelMiddleSection: {
+    position: 'absolute',
+    top: '50%',
+    marginTop: -5,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  labelSpeed: {
+    fontSize: 7,
+    fontWeight: 'bold',
+    color: 'rgba(74, 21, 37, 0.6)',
+    letterSpacing: 1,
+  },
+  labelBottomSection: {
+    position: 'absolute',
+    bottom: 15,
+    width: '100%',
+    alignItems: 'center',
+  },
+  labelSide: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: '#4A1525',
+    letterSpacing: 2,
+  },
+  centerHole: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#111',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+  },
 });
