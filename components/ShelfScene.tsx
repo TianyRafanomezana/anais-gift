@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   },
   shelfTop: {
     position: 'absolute',
-    top: (height / 2) + 80, // Ajusté pour la pochette de taille 240
+    top: (height / 2) + 230, // Ajusté pour s'aligner avec la pochette (descendue de 50px)
     width: 320,
     height: 15,
     backgroundColor: '#4A1525', // Velours bordeaux
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   shelfFront: {
     position: 'absolute',
-    top: (height / 2) + 95, // 80 + 15
+    top: (height / 2) + 245, // 230 + 15
     width: 320,
     height: 25,
     backgroundColor: '#2D0D17', // Tranche plus sombre

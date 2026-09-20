@@ -45,7 +45,7 @@ export default function App() {
   } = useVinylAudio();
 
   // On centre le vinyle et la pochette légèrement au-dessus du milieu de l'écran
-  const INITIAL_Y = (height / 2) - 160;
+  const INITIAL_Y = (height / 2) - 10;
 
   // 🎯 Position personnalisable du vinyle lorsqu'il est sur la platine
   const TURNTABLE_VINYL_X = -29; // Modifie cette valeur pour décaler horizontalement
@@ -206,7 +206,7 @@ export default function App() {
         armRotation.value = withTiming(15, { duration: 300 });
         armLift.value = withTiming(0, { duration: 300 });
         globalScale.value = withTiming(1, { duration: 300 });
-        globalTranslateY.value = withTiming(-180, { duration: 300 }); // Remonte beaucoup plus la table pour laisser place au UI en bas
+        globalTranslateY.value = withTiming(0, { duration: 300 }); // Laisse la table basse
         setAnimationStep(3);
         break;
 
@@ -223,7 +223,7 @@ export default function App() {
         armRotation.value = withTiming(38, { duration: 300 });
         armLift.value = withTiming(0, { duration: 300 });
         globalScale.value = withTiming(1, { duration: 300 });
-        globalTranslateY.value = withTiming(-180, { duration: 300 }); // Remonte beaucoup plus la table pour laisser place au UI en bas
+        globalTranslateY.value = withTiming(0, { duration: 300 }); // Laisse la table basse
         vinylRotation.value = withRepeat(
           withTiming(720, { duration: 3000, easing: Easing.linear }),
           -1,
@@ -281,6 +281,8 @@ export default function App() {
 
         // Le sol (Floor) monte depuis le bas pour remplacer le mur
         floorY.value = withTiming(-height, { duration: 1200, easing: Easing.inOut(Easing.quad) });
+        // On ne remonte plus la caméra globale (0), ce qui laisse la table bien basse pour voir le mur
+        globalTranslateY.value = withTiming(0, { duration: 1200, easing: Easing.inOut(Easing.quad) });
 
         // La platine monte en même temps que le sol
         turntableOpacity.value = 1;
@@ -641,7 +643,7 @@ const styles = StyleSheet.create({
   },
   sleeveFront: {
     position: 'absolute',
-    top: (height / 2) - 160,
+    top: (height / 2) - 10,
     alignSelf: 'center',
     width: 240,
     height: 240,
@@ -660,6 +662,18 @@ const styles = StyleSheet.create({
     elevation: 10,
     zIndex: 10,
     overflow: 'hidden',
+  },
+  shelfPlank: {
+    position: 'absolute',
+    top: (height / 2) + 230,
+    width: width,
+    height: 20,
+    backgroundColor: '#2A0812',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 15,
   },
   sleeveRingWear: {
     position: 'absolute',

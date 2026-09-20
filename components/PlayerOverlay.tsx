@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Animated, Image, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image, Pressable, Dimensions } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+
+const { height } = Dimensions.get('window');
 
 interface PlayerOverlayProps {
   isPlaying: boolean;
@@ -67,7 +69,7 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
 
   const coverTranslateY = expandAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [140, -300], // Un peu plus haut en preview
+    outputRange: [140, -300], // La pochette est coupée en bas comme souhaité
   });
 
   const coverScale = expandAnim.interpolate({
@@ -139,8 +141,8 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
         </Animated.View>
 
         {/* Le lecteur (Pillule dorée) positionné au-dessus de la pochette, sous le vinyle */}
-        <Animated.View 
-          style={[styles.cardContainer, { transform: [{ translateX: globalTranslateX }] }]} 
+        <Animated.View
+          style={[styles.cardContainer, { transform: [{ translateX: globalTranslateX }] }]}
           pointerEvents="box-none"
         >
           <View style={styles.card}>
@@ -165,7 +167,7 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
               </Pressable>
 
               {/* Barre de progression et temps à droite */}
-              <Pressable 
+              <Pressable
                 style={styles.progressContainer}
                 onLayout={(e) => {
                   trackWidthRef.current = Math.max(1, e.nativeEvent.layout.width);
@@ -207,7 +209,7 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     position: 'absolute',
-    bottom: 190, // Remonté encore plus haut
+    top: (height / 2) + 180, // Se positionne exactement sous la platine qui est maintenant centrée
     left: 20,
     right: 20,
     alignItems: 'center',
