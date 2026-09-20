@@ -18,6 +18,7 @@ import TurntableScene, { TurntableArmScene } from './components/TurntableScene';
 import VinylRecord from './components/VinylRecord';
 import PlayerOverlay from './components/PlayerOverlay';
 import WallPattern from './components/WallPattern';
+import JewelryScene from './components/JewelryScene';
 import { useVinylAudio } from './hooks/useVinylAudio';
 import { useFonts, PinyonScript_400Regular } from '@expo-google-fonts/pinyon-script';
 
@@ -28,7 +29,7 @@ export default function App() {
     PinyonScript_400Regular,
   });
 
-  const [animationStep, setAnimationStep] = useState(-1);
+  const [animationStep, setAnimationStep] = useState(-2);
   const [isCardsModalOpen, setIsCardsModalOpen] = useState(false);
   const [isLidOpen, setIsLidOpen] = useState(false);
   const playTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -80,6 +81,11 @@ export default function App() {
   const armRotation = useSharedValue(15); // Repos: légèrement incliné vers la gauche
   const armLift = useSharedValue(0);
 
+  // Animation intro bijou
+  const jewelryScale = useSharedValue(0.3); // Commence petit (apparition)
+  const jewelryOpacity = useSharedValue(1);
+  const introWhiteOpacity = useSharedValue(1); // Voile blanc initial
+
   // Nettoyage du timer à la destruction
   useEffect(() => {
     return () => {
@@ -94,6 +100,44 @@ export default function App() {
       armRotation.value = withTiming(15, { duration: 800, easing: Easing.inOut(Easing.quad) });
     }
   }, [isFinished, animationStep]);
+
+  // Animation intro bijou : blanc → révélation → zoom rubis → fondu étagère
+  useEffect(() => {
+    if (animationStep === -2) {
+      // Reset
+      jewelryScale.value = 0.3;
+      jewelryOpacity.value = 1;
+      introWhiteOpacity.value = 1;
+
+      // Phase 1 : Le voile blanc se dissipe (1s délai, puis 1.5s de fondu)
+      introWhiteOpacity.value = withDelay(1000, 
+        withTiming(0, { duration: 1500, easing: Easing.out(Easing.ease) })
+      );
+      // Le bijou grandit doucement en même temps
+      jewelryScale.value = withDelay(1000, 
+        withTiming(1, { duration: 2000, easing: Easing.out(Easing.cubic) })
+      );
+
+      // Phase 2 : Pause 2s, puis zoom dans le rubis (1.5s)
+      const zoomInTimer = setTimeout(() => {
+        jewelryScale.value = withTiming(20, { duration: 1500, easing: Easing.inOut(Easing.cubic) });
+        jewelryOpacity.value = withDelay(800, withTiming(0, { duration: 700, easing: Easing.in(Easing.ease) }));
+      }, 5000); // 1s + 2s reveal + 2s pause
+
+      // Phase 3 : Transition directe vers l'étagère (sans ancien dézoom)
+      const transitionTimer = setTimeout(() => {
+        // Pré-positionner la scène étagère à échelle normale
+        globalScale.value = 1;
+        globalTranslateY.value = 0;
+        setAnimationStep(0);
+      }, 6700);
+
+      return () => {
+        clearTimeout(zoomInTimer);
+        clearTimeout(transitionTimer);
+      };
+    }
+  }, [animationStep]);
 
   // Transition automatique de l'écran de chargement (-1) à l'étagère (0)
   useEffect(() => {
@@ -496,6 +540,15 @@ export default function App() {
     ],
   }));
 
+  const animatedJewelryStyle = useAnimatedStyle(() => ({
+    opacity: jewelryOpacity.value,
+    transform: [{ scale: jewelryScale.value }],
+  }));
+
+  const animatedWhiteOverlayStyle = useAnimatedStyle(() => ({
+    opacity: introWhiteOpacity.value,
+  }));
+
   if (!fontsLoaded) {
     return null; // Affiche un écran vide en attendant le chargement de la typo
   }
@@ -503,6 +556,17 @@ export default function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
+
+      {/* NOUVELLE SCÈNE D'INTRO - BIJOUX ANIMÉ */}
+      {animationStep === -2 && (
+        <>
+          <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 100 }, animatedJewelryStyle]}>
+            <JewelryScene />
+          </Animated.View>
+          {/* Voile blanc initial */}
+          <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 101, backgroundColor: '#FFFFFF' }, animatedWhiteOverlayStyle]} pointerEvents="none" />
+        </>
+      )}
 
       {/* SÉLECTEUR DE NAVIGATION DEBUG (caché en étape -1) */}
       {animationStep !== -1 && (

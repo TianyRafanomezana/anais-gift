@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Pressable } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  withSpring, 
-  interpolate, 
-  Extrapolation, 
+import { View, StyleSheet, Text, Pressable, ScrollView, Platform } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  interpolate,
+  Extrapolation,
   Easing,
   withDelay,
   cancelAnimation
@@ -23,20 +23,20 @@ const CARDS_DATA: CardData[] = [
   {
     id: '1',
     rectoTitle: 'Pensée n°1',
-    rectoSubtitle: 'Un doux souvenir',
-    versoText: 'Le premier jour où je t\'ai vu(e), j\'ai su que quelque chose de spécial allait commencer. Ton sourire illumine mes journées.',
+    rectoSubtitle: 'Un coeur nouveau',
+    versoText: 'Verset à lire avant de lire la suite : \n Ézéchiel 36:26-27. \n\n Ton coeur a été renouvelé en Christ. \n\n Tu as un nouveau coeur en Dieu, il reconstruit ton coeur, petit à petit, fil par fil, pour former le nouveau. \n\n Je t\'offre ce coeur en cet honneur, qu\'a chaque fois que tu le vois, ca soit une occasion de se rappeler l\'oeuvre de Dieu en toi \n\n Que ce coeur soit, admiré de tous. \n\n Tu brille ma soeur, que rien ne t\'empêche de briller. \n\n Et sache qu\'aucune pensée, aucune action, aucune décision ne t\'éloigneras de son amour. \n\n Be blessed ma soeur, tu es sa fille et tu brille de lui.',
   },
   {
     id: '2',
     rectoTitle: 'Pensée n°2',
-    rectoSubtitle: 'Pour tes 20 ans',
-    versoText: 'Avoir 20 ans, c\'est le début d\'une merveilleuse aventure. Je te souhaite que chaque instant soit rempli de joie et d\'amour.',
+    rectoSubtitle: 'Un coeur libre',
+    versoText: 'Verset à lire avant de lire la suite : \n 2 Corinthiens 3:16-17. \n\n Ton être tout entier est transformé à son image. \n\n Tu es libre et ton coeur est transformé à son image, tissé selon lui. \n\n  Que rien ne t\'arrête dans ta liberté. Si tu tombes, il te relèvera. \n\n Ce que Dieu fait avec toi, rien ne l\'empechera. \n\n Tu es libre. ',
   },
   {
     id: '3',
-    rectoTitle: 'Pensée n°3',
-    rectoSubtitle: 'Une promesse',
-    versoText: 'Quoi qu\'il arrive, je serai toujours là pour toi. C\'est une promesse du cœur, pour aujourd\'hui et pour toujours.',
+    rectoTitle: 'Pensée n°2',
+    rectoSubtitle: 'Un coeur et une \n  lettre d\'amour',
+    versoText: 'Verset à lire avant de lire la suite : \n2 Corinthiens 2:3. \n\nTon coeur est une lettre d\'amour pour ce monde autour de toi. Les passions et les dons qu\'il a mis dans ton coeur sont une lettre pour eux. \n\n Cette lettre sera lu et contemplé de tous, et c\'est Christ qu\'il verront quand ils te verront. \n\n Ce sera la lumière de Jésus qui brille en toi. \n\n Mais ce temps nécessitera d\'être préparée, tissé et endurcis à son image. \n\n Bon temps de préparation ma soeur. ',
   }
 ];
 
@@ -44,18 +44,18 @@ interface PhysicalCardsProps {
   isOpen: boolean;
 }
 
-const CardItem = ({ 
-  data, 
-  index, 
-  activeIndex, 
+const CardItem = ({
+  data,
+  index,
+  activeIndex,
   onSelect,
   isFlipped,
   onFlip,
   isOpen
-}: { 
-  data: CardData; 
-  index: number; 
-  activeIndex: number | null; 
+}: {
+  data: CardData;
+  index: number;
+  activeIndex: number | null;
   onSelect: () => void;
   isFlipped: boolean;
   onFlip: () => void;
@@ -63,10 +63,10 @@ const CardItem = ({
 }) => {
   const isSelected = activeIndex === index;
   const isAnotherSelected = activeIndex !== null && activeIndex !== index;
-  
+
   const positionProgress = useSharedValue(0); // 0 = stack, 1 = centered
   const flipProgress = useSharedValue(0); // 0 = recto, 1 = verso
-  
+
   // Animation en 2 temps
   const emergeProgress = useSharedValue(0); // 0 = inside box, 1 = emerged slightly
   const flyProgress = useSharedValue(0); // 0 = emerged, 1 = fully stacked
@@ -75,7 +75,7 @@ const CardItem = ({
   useEffect(() => {
     // Courbe de type "Apple" très douce (ease-out-quint/expo)
     const smoothEasing = Easing.bezier(0.16, 1, 0.3, 1);
-    
+
     if (isOpen) {
       // Sortie avec délai selon l'index. Ultra lent et cotonneux
       emergeProgress.value = withDelay(index * 400, withTiming(1, { duration: 1500, easing: smoothEasing }));
@@ -105,19 +105,19 @@ const CardItem = ({
     // On veut qu'elles soient réparties sur l'écran sans déborder en haut.
     // La carte du bas (index 2) se met à Y=-40 (juste au dessus de la boite).
     // Espacement de 70px (légèrement plus grand que la hauteur de 64px).
-    const stackY = -40 - ( (2 - index) * 70 ); 
+    const stackY = -40 - ((2 - index) * 70);
     // Centre de l'écran (environ la position de la carte du milieu)
-    const focusY = -110; 
+    const focusY = -110;
 
     // Interpolation Focus (0 = empilé, 1 = sélectionné et mis en avant)
     const translateY = interpolate(positionProgress.value, [0, 1], [stackY, focusY]);
     const focusScale = interpolate(positionProgress.value, [0, 1], [0.4, 0.46]);
-    
+
     // ---- 2. Phase 1 : Émergence (Sortie de la boîte) ----
     // La boîte est à Y=0. On sort vers Y=-50 (vers le haut).
     const emergeY = interpolate(emergeProgress.value, [0, 1], [10, -50]);
     // On simule une carte posée à plat qui se soulève très légèrement
-    const emergeRotateX = interpolate(emergeProgress.value, [0, 1], [90, 70]); 
+    const emergeRotateX = interpolate(emergeProgress.value, [0, 1], [90, 70]);
     const emergeScale = 0.25;
 
     // ---- 3. Phase 2 : Envol (Vers l'écran, se redresse) ----
@@ -152,7 +152,7 @@ const CardItem = ({
 
   const backStyle = useAnimatedStyle(() => {
     const opacity = interpolate(flipProgress.value, [0, 0.5, 1], [0, 0, 1], Extrapolation.CLAMP);
-    return { 
+    return {
       opacity,
       transform: [{ rotateY: '180deg' }] // Keep text readable
     };
@@ -160,8 +160,8 @@ const CardItem = ({
 
   return (
     <Animated.View style={[styles.cardContainer, animatedStyle]} pointerEvents={isOpen ? 'box-none' : 'none'}>
-      <Pressable 
-        style={StyleSheet.absoluteFill} 
+      <Pressable
+        style={StyleSheet.absoluteFill}
         onPress={(e) => {
           if (!isOpen) return; // Inactif si la boîte est fermée
           if (e && e.stopPropagation) e.stopPropagation();
@@ -180,7 +180,7 @@ const CardItem = ({
             <View style={styles.cardFrontInner}>
               <Text style={styles.rectoSubtitle}>{data.rectoSubtitle}</Text>
               <Text style={styles.rectoTitle}>{data.rectoTitle}</Text>
-              
+
               {/* Sceau cœur coquette */}
               <View style={styles.heartSeal}>
                 <Text style={styles.heartIcon}>❤</Text>
@@ -192,9 +192,14 @@ const CardItem = ({
         {/* VERSO (Back) */}
         <Animated.View style={[styles.cardFace, styles.cardBack, backStyle]}>
           <View style={styles.laceBorder}>
-            <View style={styles.cardBackInner}>
+            <ScrollView
+              style={{ flex: 1, width: '100%' }}
+              contentContainerStyle={styles.cardBackInner}
+              showsVerticalScrollIndicator={true}
+              indicatorStyle="black"
+            >
               <Text style={styles.versoText}>{data.versoText}</Text>
-            </View>
+            </ScrollView>
           </View>
         </Animated.View>
       </Pressable>
@@ -240,17 +245,32 @@ export default function PhysicalCards({ isOpen }: PhysicalCardsProps) {
 
   return (
     <Animated.View style={[styles.container, { zIndex: isEmerged ? 10 : 1 }]} pointerEvents="box-none">
+      {Platform.OS === 'web' && React.createElement('style', null, `
+        ::-webkit-scrollbar {
+          width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: rgba(74, 21, 37, 0.3);
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: rgba(74, 21, 37, 0.6);
+        }
+      `)}
       {/* Filtre noir en fond qui s'affiche quand les cartes volent vers l'écran */}
       <Animated.View style={[styles.blackOverlay, blackFilterStyle]} pointerEvents="none" />
 
       {/* Zone de clic géante pour désélectionner quand une carte est en focus */}
       {activeIndex !== null && (
-        <Pressable 
-          style={styles.backdropPressable} 
+        <Pressable
+          style={styles.backdropPressable}
           onPress={() => {
             setActiveIndex(null);
             setIsFlipped(false);
-          }} 
+          }}
         />
       )}
 
@@ -341,7 +361,7 @@ const styles = StyleSheet.create({
   },
   heartSeal: {
     position: 'absolute',
-    bottom: -15, 
+    bottom: -15,
     alignSelf: 'center',
     width: 24,
     height: 24,
@@ -349,7 +369,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#4A1525', 
+    shadowColor: '#4A1525',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 3,
@@ -370,10 +390,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#D4AF37', // Doré
   },
   cardBackInner: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 15,
+    paddingVertical: 10,
   },
   versoText: {
     fontSize: 15,
