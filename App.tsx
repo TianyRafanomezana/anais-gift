@@ -29,7 +29,10 @@ export default function App() {
   });
 
   const [animationStep, setAnimationStep] = useState(-1);
+  const [isCardsModalOpen, setIsCardsModalOpen] = useState(false);
+  const [isLidOpen, setIsLidOpen] = useState(false);
   const playTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const blockNextPress = useRef(false);
 
   // Hook audio optimisé
   const {
@@ -236,6 +239,9 @@ export default function App() {
   };
 
   const handlePress = () => {
+    if (blockNextPress.current) return;
+    if (isCardsModalOpen || isLidOpen) return;
+
     // Nouvelle position du plateau en vue de dessus pur (sans rotateX: 65deg)
     // turntableBase height = 380, centrée. Top de la base = height/2 - 190.
     // platter center = 30 (top) + 140 (half height) = 170 depuis le top de la base.
@@ -342,6 +348,37 @@ export default function App() {
 
       default:
         break;
+    }
+  };
+
+  const handleBoxPress = () => {
+    blockNextPress.current = true;
+    setTimeout(() => { blockNextPress.current = false; }, 200);
+
+    // 1. Zoom sur la boite, mais en la plaçant en BAS de l'écran
+    // La boite est à -200 du centre. Pour la mettre en bas (ex: +150 du centre avant scale),
+    // on doit translater d'environ +350. (150 * 2.5 = 375, proche du bas de l'écran).
+    globalScale.value = withTiming(2.5, { duration: 1000, easing: Easing.inOut(Easing.cubic) });
+    globalTranslateY.value = withTiming(600, { duration: 1000, easing: Easing.inOut(Easing.cubic) });
+
+    // 2. Ouvrir le couvercle après le zoom
+    setTimeout(() => {
+      setIsLidOpen(true);
+
+      // 3. Afficher les cartes après l'ouverture
+      setTimeout(() => {
+        setIsCardsModalOpen(true);
+      }, 600);
+    }, 1000);
+  };
+
+  const handleCloseCards = () => {
+    setIsCardsModalOpen(false);
+    setIsLidOpen(false);
+
+    if (animationStep === 0) {
+      globalScale.value = withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.cubic) });
+      globalTranslateY.value = withTiming(0, { duration: 1000, easing: Easing.inOut(Easing.cubic) });
     }
   };
 
@@ -500,10 +537,10 @@ export default function App() {
       )}
 
       {/* SCÈNE PRINCIPALE UNIQUE */}
-      <Pressable style={styles.fullScreenTouch} onPress={handlePress}>
-        <View style={styles.fullScreenTouch} pointerEvents="none">
+      <View style={styles.fullScreenTouch} pointerEvents="box-none">
+        <View style={styles.fullScreenTouch} pointerEvents="box-none">
           {/* CAMERA GLOBALE POUR LE ZOOM INTRODUCTIF */}
-          <Animated.View style={[styles.fullScreenTouch, animatedGlobalStyle]} pointerEvents="none">
+          <Animated.View style={[styles.fullScreenTouch, animatedGlobalStyle]} pointerEvents="box-none">
             {/* COUCHE 0 : LE MUR AU FOND (Papier peint qui bascule) */}
             <Animated.View style={[styles.wallPerspectiveWrapper, animatedWallPerspectiveStyle]} pointerEvents="none">
               <Animated.View style={[styles.wallScrollingContent, animatedWallScrollStyle]}>
@@ -512,8 +549,8 @@ export default function App() {
             </Animated.View>
 
             {/* COUCHE 1 : DÉCOR ARRIÈRE (Étagères) */}
-            <Animated.View style={[styles.layer, animatedShelfStyle]}>
-              <ShelfScene />
+            <Animated.View style={[styles.layer, animatedShelfStyle]} pointerEvents="box-none">
+              <ShelfScene onBoxPress={handleBoxPress} isLidOpen={isLidOpen} />
             </Animated.View>
 
             {/* COUCHE 1.2 : LE SOL ET LA TABLE (Qui montent ensemble) */}
@@ -561,7 +598,7 @@ export default function App() {
             </Animated.View>
           </Animated.View>
         </View>
-      </Pressable>
+      </View>
 
       {/* OVERLAY LECTEUR AUDIO (Étape 4) */}
       {animationStep === 4 && (
@@ -574,6 +611,38 @@ export default function App() {
           onPlayPausePress={handlePress}
           onSeekRatio={seekToRatio}
         />
+      )}
+
+      {/* BOUTON FERMER LES CARTES */}
+      {isCardsModalOpen && (
+        <View style={styles.closeCardsContainer}>
+          <Pressable style={styles.closeCardsBtn} onPress={handleCloseCards}>
+            <Text style={styles.closeCardsText}>✕ Ranger</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {/* BOUTONS D'ACTIONS (Étagère Principale) */}
+      {animationStep === 0 && !isLidOpen && !isCardsModalOpen && (
+        <View style={styles.actionButtonsRow}>
+          <Pressable style={styles.primaryBtn} onPress={handleBoxPress}>
+            <Text style={styles.primaryBtnText}>Ouvrir la Boîte 💌</Text>
+          </Pressable>
+          <Pressable style={styles.primaryBtn} onPress={handlePress}>
+            <Text style={styles.primaryBtnText}>Écouter le Vinyle 🎵</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {/* BOUTON SUIVANT POUR L'ANIMATION DU VINYLE */}
+      {(animationStep === -1 || (animationStep > 0 && animationStep < 4)) && !isLidOpen && !isCardsModalOpen && (
+        <View style={styles.nextButtonContainer}>
+          <Pressable style={styles.nextButton} onPress={handlePress}>
+            <Text style={styles.nextButtonText}>
+              {animationStep === -1 ? 'Commencer 🤍' : 'Continuer 🎵'}
+            </Text>
+          </Pressable>
+        </View>
       )}
 
     </SafeAreaView>
@@ -790,5 +859,87 @@ const styles = StyleSheet.create({
   debugPillTextActive: {
     color: '#1a1016',
     fontWeight: '700',
+  },
+  closeCardsContainer: {
+    position: 'absolute',
+    bottom: 40,
+    alignSelf: 'center',
+    zIndex: 10000,
+  },
+  closeCardsBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(253, 251, 247, 0.15)',
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.4)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  closeCardsText: {
+    color: '#FDFBF7',
+    fontFamily: 'PinyonScript_400Regular',
+    fontSize: 22,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  actionButtonsRow: {
+    position: 'absolute',
+    bottom: 40,
+    flexDirection: 'row',
+    alignSelf: 'center',
+    gap: 20,
+    zIndex: 100,
+  },
+  primaryBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(253, 251, 247, 0.2)',
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.5)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    backdropFilter: 'blur(4px)',
+  },
+  primaryBtnText: {
+    color: '#FDFBF7',
+    fontFamily: 'PinyonScript_400Regular',
+    fontSize: 22,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  nextButtonContainer: {
+    position: 'absolute',
+    bottom: 40,
+    alignSelf: 'center',
+    zIndex: 100,
+  },
+  nextButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(253, 251, 247, 0.2)',
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.5)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    backdropFilter: 'blur(4px)',
+  },
+  nextButtonText: {
+    color: '#FDFBF7',
+    fontFamily: 'PinyonScript_400Regular',
+    fontSize: 24,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });
