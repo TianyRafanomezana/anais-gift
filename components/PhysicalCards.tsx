@@ -30,13 +30,13 @@ const CARDS_DATA: CardData[] = [
     id: '2',
     rectoTitle: 'Pensée n°2',
     rectoSubtitle: 'Un coeur libre',
-    versoText: 'Verset à lire avant de lire la suite : \n 2 Corinthiens 3:16-17. \n\n Ton être tout entier est transformé à son image. \n\n Tu es libre et ton coeur est transformé à son image, tissé selon lui. \n\n  Que rien ne t\'arrête dans ta liberté. Si tu tombes, il te relèvera. \n\n Ce que Dieu fait avec toi, rien ne l\'empechera. \n\n Tu es libre. ',
+    versoText: 'Verset à lire avant de lire la suite : \n 2 Corinthiens 3:16-17. \n\n Ton être tout entier est transformé à son image. \n\n Tu es libre et ton coeur est transformé à son image, tissé selon lui. \n\n  Que rien ne t\'arrête dans ta liberté. Si tu tombes, il te relèvera. \n\n Ce que Dieu fait avec toi, rien ne l\'empechera. \n\n Que cette liberté soit pleinement exprimé en toi. ',
   },
   {
     id: '3',
     rectoTitle: 'Pensée n°2',
     rectoSubtitle: 'Un coeur et une \n  lettre d\'amour',
-    versoText: 'Verset à lire avant de lire la suite : \n2 Corinthiens 2:3. \n\nTon coeur est une lettre d\'amour pour ce monde autour de toi. Les passions et les dons qu\'il a mis dans ton coeur sont une lettre pour eux. \n\n Cette lettre sera lu et contemplé de tous, et c\'est Christ qu\'il verront quand ils te verront. \n\n Ce sera la lumière de Jésus qui brille en toi. \n\n Mais ce temps nécessitera d\'être préparée, tissé et endurcis à son image. \n\n Bon temps de préparation ma soeur. ',
+    versoText: 'Verset à lire avant de lire la suite : \n2 Corinthiens 2:3. \n\nTon coeur est une lettre d\'amour pour ce monde autour de toi. Les passions et les dons qu\'il a mis dans ton coeur sont une lettre pour eux. \n\n Cette lettre sera lu et contemplé de tous, et c\'est Christ qu\'il verront quand ils te verront. \n\n Ce sera et c\'est la lumière de Jésus qui brille en toi. \n\n Mais ce temps nécessitera d\'être préparée, tissé et endurcis à son image. \n\n Que ta vie soit à l\'image de ce que tu es déjà. ',
   }
 ];
 

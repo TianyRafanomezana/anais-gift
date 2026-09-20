@@ -2,15 +2,17 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, Text, Dimensions, Pressable } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing, interpolate } from 'react-native-reanimated';
 import PhysicalCards from './PhysicalCards';
+import HexPlaque from './HexPlaque';
 
 const { width, height } = Dimensions.get('window');
 
 interface ShelfSceneProps {
   onBoxPress?: () => void;
+  onVinylPlaquePress?: () => void;
   isLidOpen?: boolean;
 }
 
-export default function ShelfScene({ onBoxPress, isLidOpen = false }: ShelfSceneProps) {
+export default function ShelfScene({ onBoxPress, onVinylPlaquePress, isLidOpen = false }: ShelfSceneProps) {
   const pulseScale = useSharedValue(1);
 
   const animatedBoxStyle = useAnimatedStyle(() => ({
@@ -20,9 +22,9 @@ export default function ShelfScene({ onBoxPress, isLidOpen = false }: ShelfScene
   const lidProgress = useSharedValue(0);
 
   useEffect(() => {
-    lidProgress.value = withTiming(isLidOpen ? 1 : 0, { 
-      duration: 600, 
-      easing: isLidOpen ? Easing.out(Easing.back(1.5)) : Easing.inOut(Easing.quad) 
+    lidProgress.value = withTiming(isLidOpen ? 1 : 0, {
+      duration: 600,
+      easing: isLidOpen ? Easing.out(Easing.back(1.5)) : Easing.inOut(Easing.quad)
     });
   }, [isLidOpen]);
 
@@ -51,10 +53,15 @@ export default function ShelfScene({ onBoxPress, isLidOpen = false }: ShelfScene
 
       {/* L'étagère Supérieure (Souvenirs) */}
       <View style={styles.topShelfTop} />
-      <View style={styles.topShelfFront} />
+      <View style={styles.topShelfFront}>
+        {/* On remplace la plaque par rien ou par la box elle-même, mais on met une déco */}
+        <View style={styles.plaqueContainer}>
+          <HexPlaque label="BOÎTE À MÉDIT" onPress={() => handlePress(null)} width={150} />
+        </View>
+      </View>
 
       {/* L'Écrin Précieux (Coquette Box) */}
-      <Pressable 
+      <Pressable
         onPress={handlePress}
         style={styles.boxClickArea}
       >
@@ -62,7 +69,7 @@ export default function ShelfScene({ onBoxPress, isLidOpen = false }: ShelfScene
           {/* Base de la boîte */}
           <View style={styles.boxBase}>
             <View style={styles.labelContainer}>
-              <Text style={styles.boxText}>Pensées</Text>
+              <Text style={styles.boxText}>Pensées du coeur</Text>
             </View>
           </View>
 
@@ -84,7 +91,11 @@ export default function ShelfScene({ onBoxPress, isLidOpen = false }: ShelfScene
 
       {/* L'étagère Principale (Disque) */}
       <View style={styles.shelfTop} />
-      <View style={styles.shelfFront} />
+      <View style={styles.shelfFront}>
+        <View style={styles.plaqueContainer}>
+          <HexPlaque label="PRIERE AUDIO" onPress={() => onVinylPlaquePress && onVinylPlaquePress()} width={160} />
+        </View>
+      </View>
     </View>
   );
 }
@@ -128,7 +139,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: (height / 2) + 245, // 230 + 15
     width: 320,
-    height: 25,
+    height: 35,
     backgroundColor: '#2D0D17', // Tranche plus sombre
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
@@ -141,7 +152,7 @@ const styles = StyleSheet.create({
   topShelfTop: {
     position: 'absolute',
     top: (height / 2) - 140, // Descendue un peu plus
-    width: 130,
+    width: 180,
     height: 15,
     backgroundColor: '#4A1525',
     borderTopWidth: 1,
@@ -152,8 +163,8 @@ const styles = StyleSheet.create({
   topShelfFront: {
     position: 'absolute',
     top: (height / 2) - 125, // -140 + 15
-    width: 130,
-    height: 20,
+    width: 180,
+    height: 35,
     backgroundColor: '#2D0D17',
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
@@ -181,19 +192,17 @@ const styles = StyleSheet.create({
   boxBase: {
     width: 90,
     height: 45,
-    backgroundColor: '#FDFBF7', // Écru
+    backgroundColor: '#F8E3E5', // Rose Blush doux
     borderBottomLeftRadius: 6,
     borderBottomRightRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 3, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 10,
     borderWidth: 1,
     borderTopWidth: 0,
-    borderColor: '#EAE0D5',
+    borderColor: '#E8D0D4',
+    // Ombre interne / Épaisseur en bas comme pour le vinyle
+    borderBottomWidth: 3,
+    borderBottomColor: '#DCAFB6', // Ombre rosée plus foncée
     zIndex: 2, // Devant les cartes quand elles sortent
   },
   boxLid: {
@@ -201,7 +210,7 @@ const styles = StyleSheet.create({
     top: 0,
     width: 94,
     height: 20,
-    backgroundColor: '#FDFBF7', // Écru
+    backgroundColor: '#F8E3E5', // Rose Blush doux
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
@@ -211,7 +220,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 12,
     borderWidth: 1,
-    borderColor: '#EAE0D5',
+    borderColor: '#E8D0D4',
     zIndex: 3, // Au dessus de la base
   },
   laceBorder: {
@@ -251,7 +260,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   labelContainer: {
-    backgroundColor: '#FDFBF7',
+    backgroundColor: '#F8E3E5', // Rose Blush doux
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 2,
@@ -268,5 +277,15 @@ const styles = StyleSheet.create({
     color: '#5C2A33', // Bordeaux profond
     fontFamily: 'PinyonScript_400Regular',
     textAlign: 'center',
+  },
+  plaqueContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
   }
 });

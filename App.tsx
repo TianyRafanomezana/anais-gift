@@ -68,11 +68,9 @@ export default function App() {
   const shelfX = useSharedValue(0); // Mouvement de travelling
   const turntableOpacity = useSharedValue(0);
   const floorY = useSharedValue(0); // On commence à 0 (le top sera à 100%)
-  const globalScale = useSharedValue(4.5); // Zoom global suffisant pour cacher les bords
-  const globalTranslateY = useSharedValue(180); // Pour recentrer la pochette (40 * 4.5 = 180)
-
-  const textOpacity = useSharedValue(0);
-  const textTranslateY = useSharedValue(10);
+  const globalScale = useSharedValue(1); // Échelle normale par défaut
+  const globalTranslateY = useSharedValue(0); // Position normale par défaut
+  const hintOpacity = useSharedValue(0); // Opacité du texte d'indication
 
   // Position initiale du vinyle (centré pile derrière la pochette)
   const vinylY = useSharedValue(INITIAL_Y);
@@ -101,6 +99,16 @@ export default function App() {
     }
   }, [isFinished, animationStep]);
 
+  // Apparition retardée du texte d'indication à l'étape 3
+  useEffect(() => {
+    if (animationStep === 3) {
+      hintOpacity.value = withDelay(5000, withTiming(1, { duration: 1000 }));
+    } else {
+      cancelAnimation(hintOpacity);
+      hintOpacity.value = 0;
+    }
+  }, [animationStep]);
+
   // Animation intro bijou : blanc → révélation → zoom rubis → fondu étagère
   useEffect(() => {
     if (animationStep === -2) {
@@ -110,11 +118,11 @@ export default function App() {
       introWhiteOpacity.value = 1;
 
       // Phase 1 : Le voile blanc se dissipe (1s délai, puis 1.5s de fondu)
-      introWhiteOpacity.value = withDelay(1000, 
+      introWhiteOpacity.value = withDelay(1000,
         withTiming(0, { duration: 1500, easing: Easing.out(Easing.ease) })
       );
       // Le bijou grandit doucement en même temps
-      jewelryScale.value = withDelay(1000, 
+      jewelryScale.value = withDelay(1000,
         withTiming(1, { duration: 2000, easing: Easing.out(Easing.cubic) })
       );
 
@@ -139,20 +147,21 @@ export default function App() {
     }
   }, [animationStep]);
 
-  // Transition automatique de l'écran de chargement (-1) à l'étagère (0)
+  // Enchaînement automatique des étapes du vinyle (1 -> 2 -> 3)
+  // L'étape 4 (descente) est déclenchée manuellement par un clic sur le vinyle zoomé
   useEffect(() => {
-    if (animationStep === -1) {
-      // Lance l'apparition du texte juste avant la fin du dessin du coeur (à 3s)
-      textOpacity.value = withDelay(3000, withTiming(1, { duration: 1500, easing: Easing.out(Easing.ease) }));
-      textTranslateY.value = withDelay(3000, withTiming(0, { duration: 1500, easing: Easing.out(Easing.ease) }));
+    if (animationStep > 0 && animationStep < 3) {
+      let delay = 1200;
+      if (animationStep === 1) delay = 1200; // Sortie du disque
+      if (animationStep === 2) delay = 1000; // Bascule 3D
 
-      // L'animation du coeur prend environ 3.5s (500ms délai + 3000ms tracé)
       const timer = setTimeout(() => {
-        goToStep(0);
-      }, 3800);
+        goToStep(animationStep + 1);
+      }, delay);
       return () => clearTimeout(timer);
     }
   }, [animationStep]);
+
 
   const goToStep = (targetStep: number) => {
     if (playTimerRef.current) {
@@ -164,26 +173,7 @@ export default function App() {
     const platterCenterY = height / 2;
 
     switch (targetStep) {
-      case -1:
-        pause();
-        shelfOpacity.value = withTiming(1, { duration: 300 });
-        shelfX.value = withTiming(0, { duration: 300 });
-        vinylX.value = withTiming(60, { duration: 300 });
-        vinylY.value = withTiming(INITIAL_Y, { duration: 300 });
-        vinylScale.value = withTiming(1, { duration: 300 });
-        vinylRotation.value = withTiming(0, { duration: 300 });
-        vinylRotateX.value = withTiming(0, { duration: 300 });
-        vinylZIndex.value = 10;
-        floorY.value = withTiming(0, { duration: 300 });
-        turntableOpacity.value = withTiming(0, { duration: 300 });
-        armRotation.value = withTiming(15, { duration: 300 });
-        armLift.value = withTiming(0, { duration: 300 });
-        globalScale.value = withTiming(4.5, { duration: 300 }); // Repasse en plein écran
-        globalTranslateY.value = withTiming(180, { duration: 300 });
-        textOpacity.value = withTiming(0, { duration: 300 });
-        textTranslateY.value = withTiming(10, { duration: 300 });
-        setAnimationStep(-1);
-        break;
+
 
       case 0:
         pause();
@@ -207,81 +197,95 @@ export default function App() {
 
       case 1:
         pause();
-        shelfOpacity.value = withTiming(1, { duration: 300 });
-        shelfX.value = withTiming(-width, { duration: 300 });
-        vinylX.value = withTiming(0, { duration: 300 });
-        vinylY.value = withTiming(INITIAL_Y, { duration: 300 });
-        vinylScale.value = withTiming(1, { duration: 300 });
-        vinylRotation.value = withTiming(360, { duration: 300 });
-        vinylRotateX.value = withTiming(0, { duration: 300 });
+        shelfOpacity.value = withTiming(1, { duration: 1000 });
+        shelfX.value = withTiming(-width, { duration: 1000 });
+        vinylX.value = withTiming(0, { duration: 1000 });
+        vinylY.value = withTiming(INITIAL_Y, { duration: 1000 });
+        vinylScale.value = withTiming(1, { duration: 1000 });
+        vinylRotation.value = withTiming(360, { duration: 1000 });
+        vinylRotateX.value = withTiming(0, { duration: 1000 });
         vinylZIndex.value = 10;
-        floorY.value = withTiming(0, { duration: 300 });
-        turntableOpacity.value = withTiming(0, { duration: 300 });
-        armRotation.value = withTiming(15, { duration: 300 });
-        armLift.value = withTiming(0, { duration: 300 });
-        globalScale.value = withTiming(1, { duration: 300 });
-        globalTranslateY.value = withTiming(0, { duration: 300 });
+        floorY.value = withTiming(0, { duration: 1000 });
+        turntableOpacity.value = withTiming(0, { duration: 1000 });
+        armRotation.value = withTiming(15, { duration: 1000 });
+        armLift.value = withTiming(0, { duration: 1000 });
+        globalScale.value = withTiming(1, { duration: 1000 });
+        globalTranslateY.value = withTiming(0, { duration: 1000 });
         setAnimationStep(1);
         break;
 
       case 2:
         pause();
-        shelfOpacity.value = withTiming(1, { duration: 300 });
-        shelfX.value = withTiming(-width, { duration: 300 });
-        vinylX.value = withTiming(0, { duration: 300 });
-        vinylY.value = withTiming(INITIAL_Y, { duration: 300 });
-        vinylScale.value = withTiming(1, { duration: 300 });
-        vinylRotation.value = withTiming(360, { duration: 300 });
-        vinylRotateX.value = withTiming(88.5, { duration: 300 });
+        shelfOpacity.value = withTiming(1, { duration: 1000 });
+        shelfX.value = withTiming(-width, { duration: 1000 });
+        vinylX.value = withTiming(0, { duration: 1000 });
+        vinylY.value = withTiming(INITIAL_Y, { duration: 1000 });
+        vinylScale.value = withTiming(1, { duration: 1000 });
+        vinylRotation.value = withTiming(360, { duration: 1000 });
+        vinylRotateX.value = withTiming(88.5, { duration: 800 });
         vinylZIndex.value = 10;
-        floorY.value = withTiming(0, { duration: 300 });
-        turntableOpacity.value = withTiming(0, { duration: 300 });
-        armRotation.value = withTiming(15, { duration: 300 });
-        armLift.value = withTiming(0, { duration: 300 });
-        globalScale.value = withTiming(1, { duration: 300 });
-        globalTranslateY.value = withTiming(0, { duration: 300 });
+        floorY.value = withTiming(0, { duration: 1000 });
+        turntableOpacity.value = withTiming(0, { duration: 1000 });
+        armRotation.value = withTiming(15, { duration: 1000 });
+        armLift.value = withTiming(0, { duration: 1000 });
+        globalScale.value = withTiming(1, { duration: 1000 });
+        globalTranslateY.value = withTiming(0, { duration: 1000 });
         setAnimationStep(2);
         break;
 
       case 3:
         pause();
-        shelfOpacity.value = withTiming(1, { duration: 300 });
-        shelfX.value = withTiming(-width, { duration: 300 });
-        vinylX.value = withTiming(TURNTABLE_VINYL_X, { duration: 300 });
-        vinylY.value = withTiming(platterCenterY - 120 + TURNTABLE_VINYL_Y_OFFSET, { duration: 300 });
-        vinylScale.value = withTiming(3, { duration: 300 });
-        vinylRotation.value = withTiming(360, { duration: 300 });
-        vinylRotateX.value = withTiming(0, { duration: 300 });
+        shelfOpacity.value = withTiming(1, { duration: 1200 });
+        shelfX.value = withTiming(-width, { duration: 1200 });
+        vinylX.value = withTiming(TURNTABLE_VINYL_X, { duration: 1200 });
+        vinylY.value = withTiming(platterCenterY - 120 + TURNTABLE_VINYL_Y_OFFSET, { duration: 1200 });
+        vinylScale.value = withTiming(3, { duration: 1200 });
+        vinylRotation.value = withTiming(360, { duration: 1200 });
+        vinylRotateX.value = withTiming(0, { duration: 1200 });
         vinylZIndex.value = 10;
-        floorY.value = withTiming(-height, { duration: 300 });
-        turntableOpacity.value = withTiming(1, { duration: 300 });
-        armRotation.value = withTiming(15, { duration: 300 });
-        armLift.value = withTiming(0, { duration: 300 });
-        globalScale.value = withTiming(1, { duration: 300 });
-        globalTranslateY.value = withTiming(0, { duration: 300 }); // Laisse la table basse
+        floorY.value = withTiming(-height, { duration: 1200 });
+        turntableOpacity.value = withTiming(1, { duration: 1200 });
+        armRotation.value = withTiming(15, { duration: 1200 });
+        armLift.value = withTiming(0, { duration: 1200 });
+        globalScale.value = withTiming(1, { duration: 1200 });
+        globalTranslateY.value = withTiming(0, { duration: 1200 }); // Laisse la table basse
         setAnimationStep(3);
         break;
 
       case 4:
-        shelfOpacity.value = withTiming(1, { duration: 300 });
-        shelfX.value = withTiming(-width, { duration: 300 });
-        vinylX.value = withTiming(TURNTABLE_VINYL_X, { duration: 300 });
-        vinylY.value = withTiming(platterCenterY - 120 + TURNTABLE_VINYL_Y_OFFSET, { duration: 300 });
-        vinylScale.value = withTiming(1, { duration: 300 });
-        vinylRotateX.value = withTiming(0, { duration: 300 });
-        vinylZIndex.value = 5;
-        floorY.value = withTiming(-height, { duration: 300 });
-        turntableOpacity.value = withTiming(1, { duration: 300 });
-        armRotation.value = withTiming(38, { duration: 300 });
-        armLift.value = withTiming(0, { duration: 300 });
-        globalScale.value = withTiming(1, { duration: 300 });
-        globalTranslateY.value = withTiming(0, { duration: 300 }); // Laisse la table basse
-        vinylRotation.value = withRepeat(
-          withTiming(720, { duration: 3000, easing: Easing.linear }),
-          -1,
-          false
-        );
-        play();
+        shelfOpacity.value = withTiming(1, { duration: 1000 });
+        shelfX.value = withTiming(-width, { duration: 1000 });
+        vinylX.value = withTiming(TURNTABLE_VINYL_X, { duration: 1000 });
+        vinylY.value = withTiming(platterCenterY - 120 + TURNTABLE_VINYL_Y_OFFSET, { duration: 1000 });
+        vinylScale.value = withTiming(1, { duration: 1000 });
+        vinylRotateX.value = withTiming(0, { duration: 1000 });
+        floorY.value = withTiming(-height, { duration: 1000 });
+        turntableOpacity.value = withTiming(1, { duration: 1000 });
+        armLift.value = withTiming(0, { duration: 1000 });
+        globalScale.value = withTiming(1, { duration: 1000 });
+        globalTranslateY.value = withTiming(0, { duration: 1000 }); // Laisse la table basse
+
+        // On attend que le vinyle finisse sa descente (1000ms) pour passer sous le bras et lancer la lecture
+        const armTimer = setTimeout(() => {
+          vinylZIndex.value = 5;
+
+          // Le bras se déplace sur le disque (800ms)
+          armRotation.value = withTiming(38, { duration: 800 });
+
+          // Dès que l'aiguille touche le disque, on lance la rotation et la musique
+          playTimerRef.current = setTimeout(() => {
+            vinylRotation.value = withRepeat(
+              withTiming(720, { duration: 3000, easing: Easing.linear }),
+              -1,
+              false
+            );
+            play();
+          }, 800);
+        }, 1000);
+
+        if (playTimerRef.current) clearTimeout(playTimerRef.current);
+        playTimerRef.current = armTimer;
+
         setAnimationStep(4);
         break;
     }
@@ -483,20 +487,7 @@ export default function App() {
     };
   });
 
-  const animatedHeartStyle = useAnimatedStyle(() => {
-    // Effet "Dolly Zoom" (Vertigo) : le coeur compense le zoom global
-    // À globalScale = 1 (sur l'étagère), le coeur est à taille normale (1)
-    // À globalScale = 4.5 (intro), le coeur est réduit (0.64) pour ne pas être trop gros à l'écran
-    const heartScale = interpolate(
-      globalScale.value,
-      [1, 4.5],
-      [1, 0.64],
-      Extrapolation.CLAMP
-    );
-    return {
-      transform: [{ scale: heartScale }]
-    };
-  });
+
 
   const animatedWallPerspectiveStyle = useAnimatedStyle(() => {
     const rotateX = interpolate(
@@ -521,12 +512,7 @@ export default function App() {
     };
   });
 
-  const animatedTextStyle = useAnimatedStyle(() => {
-    return {
-      opacity: textOpacity.value,
-      transform: [{ translateY: textTranslateY.value }],
-    };
-  });
+
 
   const animatedVinylStyle = useAnimatedStyle(() => ({
     zIndex: vinylZIndex.value,
@@ -568,42 +554,40 @@ export default function App() {
         </>
       )}
 
-      {/* SÉLECTEUR DE NAVIGATION DEBUG (caché en étape -1) */}
-      {animationStep !== -1 && (
-        <View style={styles.debugBarContainer}>
-          <View style={styles.debugBar}>
-            <Text style={styles.debugTitle}>DEBUG</Text>
-            <View style={styles.debugPills}>
-              {[
-                { step: -1, label: '-1: Intro' },
-                { step: 0, label: '0: Étagère' },
-                { step: 1, label: '1: Sorti' },
-                { step: 2, label: '2: Tranche' },
-                { step: 3, label: '3: Zoom' },
-                { step: 4, label: '4: Platine' },
-              ].map((item) => (
-                <Pressable
-                  key={item.step}
-                  onPress={() => goToStep(item.step)}
+      {/* SÉLECTEUR DE NAVIGATION DEBUG */}
+      <View style={styles.debugBarContainer}>
+        <View style={styles.debugBar}>
+          <Text style={styles.debugTitle}>DEBUG</Text>
+          <View style={styles.debugPills}>
+            {[
+              { step: -2, label: '-2: Intro Bijou' },
+              { step: 0, label: '0: Étagère' },
+              { step: 1, label: '1: Sorti' },
+              { step: 2, label: '2: Tranche' },
+              { step: 3, label: '3: Zoom' },
+              { step: 4, label: '4: Platine' },
+            ].map((item) => (
+              <Pressable
+                key={item.step}
+                onPress={() => goToStep(item.step)}
+                style={[
+                  styles.debugPill,
+                  animationStep === item.step && styles.debugPillActive,
+                ]}
+              >
+                <Text
                   style={[
-                    styles.debugPill,
-                    animationStep === item.step && styles.debugPillActive,
+                    styles.debugPillText,
+                    animationStep === item.step && styles.debugPillTextActive,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.debugPillText,
-                      animationStep === item.step && styles.debugPillTextActive,
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+                  {item.label}
+                </Text>
+              </Pressable>
+            ))}
           </View>
         </View>
-      )}
+      </View>
 
       {/* SCÈNE PRINCIPALE UNIQUE */}
       <View style={styles.fullScreenTouch} pointerEvents="box-none">
@@ -619,7 +603,7 @@ export default function App() {
 
             {/* COUCHE 1 : DÉCOR ARRIÈRE (Étagères) */}
             <Animated.View style={[styles.layer, animatedShelfStyle]} pointerEvents="box-none">
-              <ShelfScene onBoxPress={handleBoxPress} isLidOpen={isLidOpen} />
+              <ShelfScene onBoxPress={handleBoxPress} onVinylPlaquePress={() => goToStep(1)} isLidOpen={isLidOpen} />
             </Animated.View>
 
             {/* COUCHE 1.2 : LE SOL ET LA TABLE (Qui montent ensemble) */}
@@ -642,8 +626,13 @@ export default function App() {
             </Animated.View>
 
             {/* COUCHE 2 : L'ACTEUR PRINCIPAL (Le Vinyle) */}
-            <Animated.View style={[styles.vinylLayer, animatedVinylStyle]} pointerEvents="none">
-              <VinylRecord size={240} />
+            <Animated.View
+              style={[styles.vinylLayer, animatedVinylStyle]}
+              pointerEvents={animationStep === 3 ? 'auto' : 'none'}
+            >
+              <Pressable onPress={() => { if (animationStep === 3) goToStep(4); }}>
+                <VinylRecord size={240} />
+              </Pressable>
             </Animated.View>
 
             {/* COUCHE 2.5 : LE BRAS DE LA PLATINE (Au-dessus du vinyle une fois posé) */}
@@ -653,27 +642,37 @@ export default function App() {
 
             {/* COUCHE 3 : DÉCOR AVANT (La Pochette) */}
             <Animated.View style={[styles.layer, animatedShelfStyle, { zIndex: 20 }]} pointerEvents="box-none">
-              <View style={styles.sleeveFront}>
+              <Pressable
+                style={styles.sleeveFront}
+                onPress={() => { if (animationStep === 0) goToStep(1); }}
+              >
                 {/* Cadre intérieur délicat (style carte d'invitation de luxe) */}
                 <View style={styles.sleeveInnerFrame} />
 
-                {/* Le texte central compensant le dézoom global */}
-                <Animated.View style={[animatedHeartStyle, styles.sleeveGraphic]}>
-                  <Animated.Text style={[styles.sleeveTopText, animatedTextStyle]}>
+                {/* Le texte central */}
+                <View style={styles.sleeveGraphic}>
+                  <Text style={styles.sleeveTopText}>
                     A gift for you
-                  </Animated.Text>
-                  <Animated.Text style={[styles.sleeveTitle, animatedTextStyle]}>
+                  </Text>
+                  <Text style={styles.sleeveTitle}>
                     My Prayer{'\n'}for your heart
-                  </Animated.Text>
-                  <Animated.Text style={[styles.sleeveSubtitle, animatedTextStyle]}>
+                  </Text>
+                  <Text style={styles.sleeveSubtitle}>
                     Anaïs's 20th
-                  </Animated.Text>
-                </Animated.View>
-              </View>
+                  </Text>
+                </View>
+              </Pressable>
             </Animated.View>
           </Animated.View>
         </View>
       </View>
+
+      {/* INDICATION CLIC (Étape 3) */}
+      {animationStep === 3 && (
+        <Animated.View style={[styles.step3HintContainer, { opacity: hintOpacity }]} pointerEvents="none">
+          <Text style={styles.step3HintText}>( Appuie sur le disque pour écouter )</Text>
+        </Animated.View>
+      )}
 
       {/* OVERLAY LECTEUR AUDIO (Étape 4) */}
       {animationStep === 4 && (
@@ -710,17 +709,6 @@ export default function App() {
           </Pressable>
           <Pressable style={styles.primaryBtn} onPress={handlePress}>
             <Text style={styles.primaryBtnText}>Écouter le Vinyle 🎵</Text>
-          </Pressable>
-        </View>
-      )}
-
-      {/* BOUTON SUIVANT POUR L'ANIMATION DU VINYLE */}
-      {(animationStep === -1 || (animationStep > 0 && animationStep < 4)) && !isLidOpen && !isCardsModalOpen && (
-        <View style={styles.nextButtonContainer}>
-          <Pressable style={styles.nextButton} onPress={handlePress}>
-            <Text style={styles.nextButtonText}>
-              {animationStep === -1 ? 'Commencer 🤍' : 'Continuer 🎵'}
-            </Text>
           </Pressable>
         </View>
       )}
@@ -1019,5 +1007,20 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,0.5)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
+  },
+  step3HintContainer: {
+    position: 'absolute',
+    bottom: 200, // Dans le tiers inférieur
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 50,
+  },
+  step3HintText: {
+    fontSize: 16,
+    color: '#A0A0A0', // Gris clair discret
+    textAlign: 'center',
+    letterSpacing: 1,
+    fontWeight: '500',
   },
 });
