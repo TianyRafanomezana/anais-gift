@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Animated, Easing, Image, Pressable, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing, Image, Pressable, useWindowDimensions } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-
-const { height } = Dimensions.get('window');
 
 interface PlayerOverlayProps {
   isPlaying: boolean;
@@ -33,6 +31,10 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
   totalTracks = 1,
   currentTrackTitle = '',
 }: PlayerOverlayProps) {
+  const { height } = useWindowDimensions();
+  const playerTop = (height / 2) + 180;
+  const coverTop = playerTop + 120; // Positionné de façon relative : 12px sous le lecteur (card ~66px)
+
   const percent = Math.min(100, Math.max(0, progress * 100));
 
   const trackWidthRef = useRef(1);
@@ -93,7 +95,7 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
 
   const coverTranslateY = expandAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [140, -300], // La pochette est coupée en bas comme souhaité
+    outputRange: [0, -398], // Glisse de sa position sous le lecteur jusqu'au centre parfait de l'écran
   });
 
   const coverScale = expandAnim.interpolate({
@@ -186,11 +188,14 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
           }} />
         </Animated.View>
 
-        {/* La pochette interactive (en bas, dépassant de l'écran) */}
+        {/* La pochette interactive (positionnée relativement sous le player) */}
         <Animated.View
           style={[
             styles.floatingCoverContainer,
-            { transform: [{ translateY: mountTranslateY }, { translateY: coverTranslateY }, { scale: coverScale }] }
+            {
+              top: coverTop,
+              transform: [{ translateY: mountTranslateY }, { translateY: coverTranslateY }, { scale: coverScale }]
+            }
           ]}
           pointerEvents="box-none"
         >
@@ -208,11 +213,13 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
             <Animated.View style={[styles.coverArt, styles.coverBack, { transform: [{ perspective: 1000 }, { rotateY: backRotateY }], opacity: backOpacity, position: 'absolute' }]}>
               <View style={styles.coverBackInner}>
                 <Text style={styles.trackListTitle}>Tracklist</Text>
-                <View style={styles.trackItem}>
-                  <Text style={styles.trackName}> 1. Prayer for your heart</Text>
-                </View>
-                <View style={styles.trackItem}>
-                  <Text style={styles.trackName}> 2. Memories of your inspiration</Text>
+                <View style={styles.trackList}>
+                  <View style={styles.trackItem}>
+                    <Text style={styles.trackName}>1. Prayer for your heart</Text>
+                  </View>
+                  <View style={styles.trackItem}>
+                    <Text style={styles.trackName}>2. Memories of your inspiration</Text>
+                  </View>
                 </View>
                 <Text style={styles.coverMessage}>LIMITED EDITION</Text>
               </View>
@@ -220,9 +227,9 @@ export const PlayerOverlay = React.memo(function PlayerOverlay({
           </Pressable>
         </Animated.View>
 
-        {/* Le lecteur (Pillule dorée) positionné au-dessus de la pochette, sous le vinyle */}
+        {/* Le lecteur (Pillule dorée) positionné sous le vinyle */}
         <Animated.View
-          style={[styles.cardContainer, { transform: [{ translateX: globalTranslateX }] }]}
+          style={[styles.cardContainer, { top: playerTop, transform: [{ translateX: globalTranslateX }] }]}
           pointerEvents="box-none"
         >
           <View style={styles.card}>
@@ -316,7 +323,6 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     position: 'absolute',
-    top: (height / 2) + 180, // Se positionne exactement sous la platine qui est maintenant centrée
     left: 20,
     right: 20,
     alignItems: 'center',
@@ -343,7 +349,6 @@ const styles = StyleSheet.create({
   },
   floatingCoverContainer: {
     position: 'absolute',
-    bottom: 0,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -391,7 +396,8 @@ const styles = StyleSheet.create({
   coverBackInner: {
     flex: 1,
     width: '100%',
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -402,12 +408,19 @@ const styles = StyleSheet.create({
     fontFamily: 'PinyonScript_400Regular',
     fontSize: 28,
     color: '#5C2A33',
-    marginBottom: 20,
+    marginBottom: 18,
+    textAlign: 'center',
+  },
+  trackList: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   trackItem: {
-    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 10,
+    width: '100%',
   },
   trackNumber: {
     fontSize: 12,
@@ -416,13 +429,15 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   trackName: {
-    fontSize: 16,
+    fontSize: 13.5,
     color: '#4A1525',
     fontStyle: 'italic',
+    textAlign: 'center',
+    lineHeight: 19,
   },
   coverMessage: {
-    marginTop: 30,
-    fontSize: 12,
+    marginTop: 22,
+    fontSize: 11,
     color: '#9E6C75',
     textTransform: 'uppercase',
     letterSpacing: 2,
