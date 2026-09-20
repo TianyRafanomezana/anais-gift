@@ -1,5 +1,4 @@
 {
   "buildCommand": "npx expo export",
-  "outputDirectory": "dist",
-  "framework": "other"
+  "outputDirectory": "dist"
 }
