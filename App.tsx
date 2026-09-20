@@ -499,6 +499,7 @@ export default function App() {
         </View>
       )}
 
+      {/* SCÈNE PRINCIPALE UNIQUE */}
       <Pressable style={styles.fullScreenTouch} onPress={handlePress}>
         <View style={styles.fullScreenTouch} pointerEvents="none">
           {/* CAMERA GLOBALE POUR LE ZOOM INTRODUCTIF */}
@@ -510,7 +511,7 @@ export default function App() {
               </Animated.View>
             </Animated.View>
 
-            {/* COUCHE 1 : DÉCOR ARRIÈRE (Étagère) */}
+            {/* COUCHE 1 : DÉCOR ARRIÈRE (Étagères) */}
             <Animated.View style={[styles.layer, animatedShelfStyle]}>
               <ShelfScene />
             </Animated.View>
