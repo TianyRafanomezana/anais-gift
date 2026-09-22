@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Anais-gift",
-    "slug": "Anais-gift",
+    "name": "Brand New Heart",
+    "slug": "Brand-New-Heart",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/brand-new-heart-icon.jpg",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true

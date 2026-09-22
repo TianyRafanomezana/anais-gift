@@ -51,8 +51,6 @@ export default function ShelfScene({ onBoxPress, onVinylPlaquePress, isLidOpen =
         <Text style={styles.instructionText}>🎧 Installe-toi au calme...</Text>
       </View>
 
-      {/* Leds invisibles : Glow Doré pour la petite étagère */}
-      <View style={styles.topShelfGlow} />
       {/* L'étagère Supérieure (Souvenirs) */}
       <View style={styles.topShelfTop} />
       <View style={styles.topShelfFront}>
@@ -91,8 +89,6 @@ export default function ShelfScene({ onBoxPress, onVinylPlaquePress, isLidOpen =
         </Animated.View>
       </Pressable>
 
-      {/* Leds invisibles : Glow Doré pour la grande étagère */}
-      <View style={styles.shelfGlow} />
       {/* L'étagère Principale (Disque) */}
       <View style={styles.shelfTop} />
       <View style={styles.shelfFront}>
@@ -177,30 +173,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 10,
-  },
-  shelfGlow: {
-    position: 'absolute',
-    top: (height / 2) + 240, 
-    width: 280,
-    height: 10,
-    backgroundColor: 'transparent',
-    shadowColor: '#FFD700', // Or éclatant pour le LED
-    shadowOffset: { width: 0, height: -15 }, // Éclaire vers le haut sur le mur
-    shadowOpacity: 0.35,
-    shadowRadius: 40,
-    elevation: 20,
-  },
-  topShelfGlow: {
-    position: 'absolute',
-    top: (height / 2) - 135, 
-    width: 150,
-    height: 10,
-    backgroundColor: 'transparent',
-    shadowColor: '#FFD700', // Or éclatant
-    shadowOffset: { width: 0, height: -15 },
-    shadowOpacity: 0.35,
-    shadowRadius: 30,
-    elevation: 15,
   },
   boxClickArea: {
     position: 'absolute',

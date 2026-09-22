@@ -104,12 +104,30 @@ export default function App() {
     }
   }, [isFinished, animationStep]);
 
+  // Replace le bras sur le disque si on change manuellement de piste
+  useEffect(() => {
+    if (animationStep === 4) {
+      // Le bras revient sur le disque
+      armRotation.value = withTiming(38, { duration: 800, easing: Easing.inOut(Easing.quad) });
+      armLift.value = withTiming(0, { duration: 300 });
+      
+      // Assure que le vinyle tourne bien
+      const currentAngle = vinylRotation.value % 360;
+      vinylRotation.value = currentAngle;
+      vinylRotation.value = withRepeat(
+        withTiming(currentAngle + 360, { duration: 3000, easing: Easing.linear }),
+        -1,
+        false
+      );
+    }
+  }, [currentTrackIndex]);
+
   // Apparition retardée du texte d'indication à l'étape 3 et -2
   useEffect(() => {
     if (animationStep === 3) {
-      hintOpacity.value = withDelay(5000, withTiming(1, { duration: 1000 }));
+      hintOpacity.value = withDelay(2000, withTiming(1, { duration: 1000 }));
     } else if (animationStep === -2) {
-      hintOpacity.value = withDelay(5000, withTiming(1, { duration: 1000 }));
+      hintOpacity.value = withDelay(2000, withTiming(1, { duration: 1000 }));
     } else {
       cancelAnimation(hintOpacity);
       hintOpacity.value = 0;
@@ -393,7 +411,10 @@ export default function App() {
           // 3. Le vinyle s'arrête de tourner
           cancelAnimation(vinylRotation);
         } else {
-          // 1. Le bras se repose
+          // 1. Le bras se remet sur le disque (s'il était rentré) et s'abaisse
+          if (armRotation.value < 38) {
+            armRotation.value = withTiming(38, { duration: 800, easing: Easing.inOut(Easing.quad) });
+          }
           armLift.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.quad) });
           // 2. Le vinyle reprend sa rotation depuis son angle actuel
           const currentAngle = vinylRotation.value % 360;
@@ -438,10 +459,9 @@ export default function App() {
     setTimeout(() => { blockNextPress.current = false; }, 200);
 
     // 1. Zoom sur la boite, mais en la plaçant en BAS de l'écran
-    // La boite est à -200 du centre. Pour la mettre en bas (ex: +150 du centre avant scale),
-    // on doit translater d'environ +350. (150 * 2.5 = 375, proche du bas de l'écran).
+    // On translate un peu plus bas (680) pour laisser le titre respirer en haut, sans sortir de l'écran
     globalScale.value = withTiming(2.5, { duration: 1000, easing: Easing.inOut(Easing.cubic) });
-    globalTranslateY.value = withTiming(600, { duration: 1000, easing: Easing.inOut(Easing.cubic) });
+    globalTranslateY.value = withTiming(680, { duration: 1000, easing: Easing.inOut(Easing.cubic) });
 
     // 2. Ouvrir le couvercle après le zoom
     setTimeout(() => {
@@ -595,7 +615,7 @@ export default function App() {
 
           {/* Texte contemplatif façon cinématographique */}
           <Animated.View style={[{ position: 'absolute', bottom: height * 0.27, alignSelf: 'center', zIndex: 102, alignItems: 'center' }, animatedTitleContainerStyle]} pointerEvents="none">
-            <Text style={{ fontFamily: 'PinyonScript_400Regular', fontSize: 52, color: '#8a0e30', textAlign: 'center' }}>
+            <Text style={{ fontFamily: 'PinyonScript_400Regular', fontSize: 46, color: '#8a0e30', textAlign: 'center' }}>
               Brand New Heart
             </Text>
             <Text style={{ fontSize: 16, color: '#cc9900', textAlign: 'center', marginTop: 8, letterSpacing: 3, textTransform: 'uppercase' }}>

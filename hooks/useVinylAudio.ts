@@ -8,8 +8,8 @@ import {
 } from 'expo-audio';
 
 export const VINYL_TRACKS = [
-  { id: 1, title: 'Prayer to you', source: require('../assets/audio/impro piano.m4a') },
-  { id: 2, title: 'Inspiration memories', source: require('../assets/audio/audio-anais.mp4') },
+  { id: 1, title: 'Prayer to you', source: require('../assets/audio/audio-anais.mp4') },
+  { id: 2, title: 'Inspiration memories', source: require('../assets/audio/audio-discuss.mp4') },
 ];
 
 export interface VinylAudioOptions {
