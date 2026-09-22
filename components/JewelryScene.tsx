@@ -27,7 +27,7 @@ export default function JewelryScene({ rubyScale }: JewelrySceneProps) {
             const centerX = width / 2;
             const centerY = height / 2 - 55;
             const numLinks = 15;
-            
+
             // Côté gauche
             for (let i = 0; i < numLinks; i++) {
               const t = i / numLinks;
@@ -68,8 +68,8 @@ export default function JewelryScene({ rubyScale }: JewelrySceneProps) {
           {/* Anneau de liaison */}
           <Circle cx={width / 2} cy={height / 2 - 50} r="4" stroke="#cc9900" strokeWidth="2.5" fill="none" />
           {/* Traits de liaison derniers maillons → anneau */}
-          <Path d={`M ${width / 2 - (width/2)/15} ${height / 4 + (14/15) * (height / 2 - 55 - height / 4)} L ${width / 2} ${height / 2 - 54}`} stroke="#cc9900" strokeWidth="1.5" />
-          <Path d={`M ${width / 2 + (width/2)/15} ${height / 4 + (14/15) * (height / 2 - 55 - height / 4)} L ${width / 2} ${height / 2 - 54}`} stroke="#cc9900" strokeWidth="1.5" />
+          <Path d={`M ${width / 2 - (width / 2) / 15} ${height / 4 + (14 / 15) * (height / 2 - 55 - height / 4)} L ${width / 2} ${height / 2 - 54}`} stroke="#cc9900" strokeWidth="1.5" />
+          <Path d={`M ${width / 2 + (width / 2) / 15} ${height / 4 + (14 / 15) * (height / 2 - 55 - height / 4)} L ${width / 2} ${height / 2 - 54}`} stroke="#cc9900" strokeWidth="1.5" />
         </Svg>
       </View>
 
@@ -105,14 +105,14 @@ export default function JewelryScene({ rubyScale }: JewelrySceneProps) {
 
             {/* === FACETTES REMPLIES === */}
 
-            {/* BOUCLIER CENTRAL (Table) - le plus vif */}
-            <Path d="M -30 4 L -15 -10 L 15 -10 L 30 4 L 0 47 Z" fill="#e8184a" />
+            {/* BOUCLIER CENTRAL (Table) - carmin éclatant (plus bordeaux qu'avant, mais lumineux) */}
+            <Path d="M -30 4 L -15 -10 L 15 -10 L 30 4 L 0 47 Z" fill="#c41a3a" />
 
             {/* FACETTES SUPÉRIEURES */}
             {/* Top center - highlight (lumière directe) */}
             <Path d="M -15 -10 L -5 -35 L 5 -35 L 15 -10 Z" fill="#ff758f" />
-            {/* Top-left petit triangle */}
-            <Path d="M -15 -10 L -40 -30 L -5 -35 Z" fill="#ff4d6d" />
+            {/* Top-left petit triangle - reflet intense */}
+            <Path d="M -15 -10 L -40 -30 L -5 -35 Z" fill="#ffb3c6" />
             {/* Top-right petit triangle */}
             <Path d="M 15 -10 L 5 -35 L 40 -30 Z" fill="#c9184a" />
 

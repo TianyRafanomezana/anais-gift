@@ -129,9 +129,9 @@ const styles = StyleSheet.create({
     top: (height / 2) + 230, // Ajusté pour s'aligner avec la pochette (descendue de 50px)
     width: 320,
     height: 15,
-    backgroundColor: '#4A1525', // Velours bordeaux
+    backgroundColor: '#520A14', // Bois/Velours rouge sombre
     borderTopWidth: 1,
-    borderTopColor: '#5C1D30',
+    borderTopColor: '#6E0E1B', // Reflet rouge plus clair
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
   },
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     top: (height / 2) + 245, // 230 + 15
     width: 320,
     height: 35,
-    backgroundColor: '#2D0D17', // Tranche plus sombre
+    backgroundColor: '#2E040A', // Tranche très sombre (presque noire)
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
     shadowColor: '#000',
@@ -154,9 +154,9 @@ const styles = StyleSheet.create({
     top: (height / 2) - 140, // Descendue un peu plus
     width: 180,
     height: 15,
-    backgroundColor: '#4A1525',
+    backgroundColor: '#520A14',
     borderTopWidth: 1,
-    borderTopColor: '#5C1D30',
+    borderTopColor: '#6E0E1B',
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
   },
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     top: (height / 2) - 125, // -140 + 15
     width: 180,
     height: 35,
-    backgroundColor: '#2D0D17',
+    backgroundColor: '#2E040A',
     borderBottomLeftRadius: 4,
     borderBottomRightRadius: 4,
     shadowColor: '#000',

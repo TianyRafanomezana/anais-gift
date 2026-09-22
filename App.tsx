@@ -769,7 +769,7 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#1E1119', // Fond nuit étoilée sombre
+    backgroundColor: '#2A040A', // Vrai rouge carmin très sombre
     overflow: 'hidden',
   },
   fullScreenTouch: {
@@ -868,7 +868,7 @@ const styles = StyleSheet.create({
     height: 232,
     borderRadius: 116,
     borderWidth: 1,
-    borderColor: 'rgba(92, 42, 51, 0.05)', // Empreinte circulaire bordeaux très subtile
+    borderColor: 'rgba(74, 8, 19, 0.08)', // Empreinte circulaire carmin subtile
   },
   sleeveInnerFrame: {
     position: 'absolute',
@@ -877,7 +877,7 @@ const styles = StyleSheet.create({
     left: 12,
     right: 12,
     borderWidth: 1,
-    borderColor: 'rgba(92, 42, 51, 0.15)', // Ligne bordeaux très fine et subtile
+    borderColor: 'rgba(74, 8, 19, 0.25)', // Ligne carmin plus visible
   },
   sleeveGraphic: {
     alignItems: 'center',
@@ -888,15 +888,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -40, // Symétrie parfaite avec le texte du bas
     fontSize: 9,
-    color: '#9E6C75', // Bordeaux adouci (rose poudré sombre)
+    color: '#38040C', // Rouge très sombre pour une lecture parfaite
     letterSpacing: 3,
     textTransform: 'uppercase',
     textAlign: 'center',
+    fontWeight: '600', // Ajout de gras pour les petits textes
   },
   sleeveTitle: {
     fontFamily: 'PinyonScript_400Regular',
     fontSize: 38, // Légèrement plus petit pour plus de délicatesse
-    color: '#5C2A33', // Bordeaux profond et romantique (classy)
+    color: '#1A0206', // Rouge presque noir
     textAlign: 'center',
     lineHeight: 40,
   },
@@ -904,10 +905,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -40, // Symétrie parfaite avec le texte du haut
     fontSize: 9,
-    color: '#9E6C75',
+    color: '#38040C', // Rouge très sombre pour une lecture parfaite
     letterSpacing: 3,
     textTransform: 'uppercase',
     textAlign: 'center',
+    fontWeight: '600', // Ajout de gras
   },
   sleeveText: {
     color: '#D4AF37',
