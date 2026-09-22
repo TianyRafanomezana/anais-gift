@@ -80,9 +80,13 @@ export default function App() {
   const armLift = useSharedValue(0);
 
   // Animation intro bijou
-  const jewelryScale = useSharedValue(0.3); // Commence petit (apparition)
+  const INITIAL_JEWELRY_SCALE = 3.5;
+  const INITIAL_JEWELRY_TRANSLATE_Y = -(height * 0.5 + 300);
+  const jewelryScale = useSharedValue(INITIAL_JEWELRY_SCALE);
+  const jewelryTranslateY = useSharedValue(INITIAL_JEWELRY_TRANSLATE_Y);
   const jewelryOpacity = useSharedValue(1);
-  const introWhiteOpacity = useSharedValue(1); // Voile blanc initial
+  const titleReveal = useSharedValue(0);
+  const titleOpacity = useSharedValue(1);
 
   // Nettoyage du timer à la destruction
   useEffect(() => {
@@ -99,9 +103,11 @@ export default function App() {
     }
   }, [isFinished, animationStep]);
 
-  // Apparition retardée du texte d'indication à l'étape 3
+  // Apparition retardée du texte d'indication à l'étape 3 et -2
   useEffect(() => {
     if (animationStep === 3) {
+      hintOpacity.value = withDelay(5000, withTiming(1, { duration: 1000 }));
+    } else if (animationStep === -2) {
       hintOpacity.value = withDelay(5000, withTiming(1, { duration: 1000 }));
     } else {
       cancelAnimation(hintOpacity);
@@ -109,41 +115,25 @@ export default function App() {
     }
   }, [animationStep]);
 
-  // Animation intro bijou : blanc → révélation → zoom rubis → fondu étagère
+  // Animation intro bijou : cadrage bas blanc → dézoom & descente → pause → zoom rubis → étagère
   useEffect(() => {
     if (animationStep === -2) {
-      // Reset
-      jewelryScale.value = 0.3;
+      // Reset position initiale : cadré dans le blanc pur sous le bijou
+      jewelryScale.value = INITIAL_JEWELRY_SCALE;
+      jewelryTranslateY.value = INITIAL_JEWELRY_TRANSLATE_Y;
       jewelryOpacity.value = 1;
-      introWhiteOpacity.value = 1;
+      titleReveal.value = 0;
+      titleOpacity.value = 1;
 
-      // Phase 1 : Le voile blanc se dissipe (1s délai, puis 1.5s de fondu)
-      introWhiteOpacity.value = withDelay(1000,
-        withTiming(0, { duration: 1500, easing: Easing.out(Easing.ease) })
-      );
-      // Le bijou grandit doucement en même temps
-      jewelryScale.value = withDelay(1000,
-        withTiming(1, { duration: 2000, easing: Easing.out(Easing.cubic) })
-      );
+      // Phase 1 : Révélation (dézoom immédiat et descente du bijou en 2.2s)
+      jewelryScale.value = withTiming(1, { duration: 2200, easing: Easing.out(Easing.cubic) });
+      jewelryTranslateY.value = withTiming(0, { duration: 2200, easing: Easing.out(Easing.cubic) });
 
-      // Phase 2 : Pause 2s, puis zoom dans le rubis (1.5s)
-      const zoomInTimer = setTimeout(() => {
-        jewelryScale.value = withTiming(20, { duration: 1500, easing: Easing.inOut(Easing.cubic) });
-        jewelryOpacity.value = withDelay(800, withTiming(0, { duration: 700, easing: Easing.in(Easing.ease) }));
-      }, 5000); // 1s + 2s reveal + 2s pause
+      // Phase 2 : Pause contemplative (infinie, jusqu'au clic)
+      // On dévoile le titre "Brand New Heart" en fondu ascendant quand le bijou arrive au centre
+      titleReveal.value = withDelay(2000, withTiming(1, { duration: 1500, easing: Easing.out(Easing.cubic) }));
 
-      // Phase 3 : Transition directe vers l'étagère (sans ancien dézoom)
-      const transitionTimer = setTimeout(() => {
-        // Pré-positionner la scène étagère à échelle normale
-        globalScale.value = 1;
-        globalTranslateY.value = 0;
-        setAnimationStep(0);
-      }, 6700);
-
-      return () => {
-        clearTimeout(zoomInTimer);
-        clearTimeout(transitionTimer);
-      };
+      // Phase 3 & 4 : Le plongeon vers l'étagère est désormais déclenché manuellement au clic.
     }
   }, [animationStep]);
 
@@ -173,7 +163,25 @@ export default function App() {
     const platterCenterY = height / 2;
 
     switch (targetStep) {
-
+      case -2:
+        pause();
+        cancelAnimation(jewelryScale);
+        cancelAnimation(jewelryTranslateY);
+        cancelAnimation(jewelryOpacity);
+        cancelAnimation(titleReveal);
+        cancelAnimation(titleOpacity);
+        jewelryScale.value = INITIAL_JEWELRY_SCALE;
+        jewelryTranslateY.value = INITIAL_JEWELRY_TRANSLATE_Y;
+        jewelryOpacity.value = 1;
+        titleReveal.value = 0;
+        titleOpacity.value = 1;
+        if (animationStep === -2) {
+          setAnimationStep(-1);
+          setTimeout(() => setAnimationStep(-2), 50);
+        } else {
+          setAnimationStep(-2);
+        }
+        break;
 
       case 0:
         pause();
@@ -404,6 +412,26 @@ export default function App() {
     }
   };
 
+  const handleJewelryPress = () => {
+    if (blockNextPress.current) return;
+    blockNextPress.current = true;
+
+    // Phase 3 : Zoom plongeant dans le rubis (1.5s)
+    titleOpacity.value = withTiming(0, { duration: 500, easing: Easing.in(Easing.ease) }); // Le texte s'estompe rapidement
+    hintOpacity.value = withTiming(0, { duration: 500, easing: Easing.in(Easing.ease) }); // L'indication s'estompe aussi
+    jewelryScale.value = withTiming(25, { duration: 1500, easing: Easing.in(Easing.cubic) });
+    jewelryTranslateY.value = withTiming(500, { duration: 1500, easing: Easing.in(Easing.cubic) });
+    jewelryOpacity.value = withDelay(800, withTiming(0, { duration: 700, easing: Easing.in(Easing.ease) }));
+
+    // Phase 4 : Transition directe vers l'étagère
+    setTimeout(() => {
+      globalScale.value = 1;
+      globalTranslateY.value = 0;
+      setAnimationStep(0);
+      blockNextPress.current = false;
+    }, 1500);
+  };
+
   const handleBoxPress = () => {
     blockNextPress.current = true;
     setTimeout(() => { blockNextPress.current = false; }, 200);
@@ -528,11 +556,17 @@ export default function App() {
 
   const animatedJewelryStyle = useAnimatedStyle(() => ({
     opacity: jewelryOpacity.value,
-    transform: [{ scale: jewelryScale.value }],
+    transform: [
+      { translateY: jewelryTranslateY.value },
+      { scale: jewelryScale.value }
+    ],
   }));
 
-  const animatedWhiteOverlayStyle = useAnimatedStyle(() => ({
-    opacity: introWhiteOpacity.value,
+  const animatedTitleContainerStyle = useAnimatedStyle(() => ({
+    opacity: titleOpacity.value * titleReveal.value, // Fondu ascendant
+    transform: [
+      { translateY: interpolate(titleReveal.value, [0, 1], [15, 0], Extrapolation.CLAMP) } // Glisse de 15px vers le haut
+    ]
   }));
 
   if (!fontsLoaded) {
@@ -545,13 +579,28 @@ export default function App() {
 
       {/* NOUVELLE SCÈNE D'INTRO - BIJOUX ANIMÉ */}
       {animationStep === -2 && (
-        <>
-          <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 100 }, animatedJewelryStyle]}>
+        <Pressable style={[StyleSheet.absoluteFill, { zIndex: 1000 }]} onPress={handleJewelryPress}>
+          {/* Fond blanc uni pour couvrir l'écran sous le bijou en toute circonstance */}
+          <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 99, backgroundColor: '#FFFFFF', opacity: jewelryOpacity }]} pointerEvents="none" />
+          <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 100 }, animatedJewelryStyle]} pointerEvents="none">
             <JewelryScene />
           </Animated.View>
-          {/* Voile blanc initial */}
-          <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 101, backgroundColor: '#FFFFFF' }, animatedWhiteOverlayStyle]} pointerEvents="none" />
-        </>
+
+          {/* Texte contemplatif façon cinématographique */}
+          <Animated.View style={[{ position: 'absolute', bottom: height * 0.27, alignSelf: 'center', zIndex: 102, alignItems: 'center' }, animatedTitleContainerStyle]} pointerEvents="none">
+            <Text style={{ fontFamily: 'PinyonScript_400Regular', fontSize: 52, color: '#8a0e30', textAlign: 'center' }}>
+              Brand New Heart
+            </Text>
+            <Text style={{ fontSize: 16, color: '#cc9900', textAlign: 'center', marginTop: 8, letterSpacing: 3, textTransform: 'uppercase' }}>
+              for Anais
+            </Text>
+          </Animated.View>
+
+          {/* Indication clic */}
+          <Animated.View style={[{ position: 'absolute', bottom: 40, alignSelf: 'center', zIndex: 105, opacity: hintOpacity }]} pointerEvents="none">
+            <Text style={{ fontSize: 12, color: '#cc9900', letterSpacing: 3, textTransform: 'uppercase', opacity: 0.7 }}>( Tape pour explorer le cœur )</Text>
+          </Animated.View>
+        </Pressable>
       )}
 
       {/* SÉLECTEUR DE NAVIGATION DEBUG */}
