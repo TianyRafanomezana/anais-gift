@@ -19,6 +19,7 @@ import VinylRecord from './components/VinylRecord';
 import PlayerOverlay from './components/PlayerOverlay';
 import WallPattern from './components/WallPattern';
 import JewelryScene from './components/JewelryScene';
+import TopNavigation from './components/TopNavigation';
 import { useVinylAudio } from './hooks/useVinylAudio';
 import { useFonts, PinyonScript_400Regular } from '@expo-google-fonts/pinyon-script';
 
@@ -577,6 +578,12 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
 
+      {/* HEADER DE NAVIGATION (Visible uniquement dans la pièce) */}
+      <TopNavigation 
+        isVisible={animationStep >= 0} 
+        onBackPress={() => goToStep(0)} 
+      />
+
       {/* NOUVELLE SCÈNE D'INTRO - BIJOUX ANIMÉ */}
       {animationStep === -2 && (
         <Pressable style={[StyleSheet.absoluteFill, { zIndex: 1000 }]} onPress={handleJewelryPress}>
@@ -603,40 +610,7 @@ export default function App() {
         </Pressable>
       )}
 
-      {/* SÉLECTEUR DE NAVIGATION DEBUG */}
-      <View style={styles.debugBarContainer}>
-        <View style={styles.debugBar}>
-          <Text style={styles.debugTitle}>DEBUG</Text>
-          <View style={styles.debugPills}>
-            {[
-              { step: -2, label: '-2: Intro Bijou' },
-              { step: 0, label: '0: Étagère' },
-              { step: 1, label: '1: Sorti' },
-              { step: 2, label: '2: Tranche' },
-              { step: 3, label: '3: Zoom' },
-              { step: 4, label: '4: Platine' },
-            ].map((item) => (
-              <Pressable
-                key={item.step}
-                onPress={() => goToStep(item.step)}
-                style={[
-                  styles.debugPill,
-                  animationStep === item.step && styles.debugPillActive,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.debugPillText,
-                    animationStep === item.step && styles.debugPillTextActive,
-                  ]}
-                >
-                  {item.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      </View>
+
 
       {/* SCÈNE PRINCIPALE UNIQUE */}
       <View style={styles.fullScreenTouch} pointerEvents="box-none">
@@ -750,17 +724,7 @@ export default function App() {
         </View>
       )}
 
-      {/* BOUTONS D'ACTIONS (Étagère Principale) */}
-      {animationStep === 0 && !isLidOpen && !isCardsModalOpen && (
-        <View style={styles.actionButtonsRow}>
-          <Pressable style={styles.primaryBtn} onPress={handleBoxPress}>
-            <Text style={styles.primaryBtnText}>Ouvrir la Boîte 💌</Text>
-          </Pressable>
-          <Pressable style={styles.primaryBtn} onPress={handlePress}>
-            <Text style={styles.primaryBtnText}>Écouter le Vinyle 🎵</Text>
-          </Pressable>
-        </View>
-      )}
+
 
     </SafeAreaView>
   );
@@ -888,16 +852,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -40, // Symétrie parfaite avec le texte du bas
     fontSize: 9,
-    color: '#38040C', // Rouge très sombre pour une lecture parfaite
+    color: '#9E6C75', // Bordeaux adouci (rose poudré sombre/violet)
     letterSpacing: 3,
     textTransform: 'uppercase',
     textAlign: 'center',
-    fontWeight: '600', // Ajout de gras pour les petits textes
   },
   sleeveTitle: {
     fontFamily: 'PinyonScript_400Regular',
     fontSize: 38, // Légèrement plus petit pour plus de délicatesse
-    color: '#1A0206', // Rouge presque noir
+    color: '#5C2A33', // Bordeaux profond et romantique (classy)
     textAlign: 'center',
     lineHeight: 40,
   },
@@ -905,11 +868,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -40, // Symétrie parfaite avec le texte du haut
     fontSize: 9,
-    color: '#38040C', // Rouge très sombre pour une lecture parfaite
+    color: '#9E6C75',
     letterSpacing: 3,
     textTransform: 'uppercase',
     textAlign: 'center',
-    fontWeight: '600', // Ajout de gras
   },
   sleeveText: {
     color: '#D4AF37',
