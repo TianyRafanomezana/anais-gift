@@ -36,7 +36,7 @@ const CARDS_DATA: CardData[] = [
     id: '3',
     rectoTitle: 'Pensée n°2',
     rectoSubtitle: 'Un coeur et une \n  lettre d\'amour',
-    versoText: 'Verset à lire avant de lire la suite : \n2 Corinthiens 2:3. \n\nTon coeur est une lettre d\'amour pour ce monde autour de toi. Les passions et les dons qu\'il a mis dans ton coeur sont une lettre pour eux. \n\n Cette lettre sera lu et contemplé de tous, et c\'est Christ qu\'il verront quand ils te verront. \n\n Ce sera et c\'est la lumière de Jésus qui brille en toi. \n\n Mais ce temps nécessitera d\'être préparée, tissé et endurcis à son image. \n\n Que ta vie soit à l\'image de ce que tu es déjà. ',
+    versoText: 'Verset à lire avant de lire la suite : \n2 Corinthiens 3:3. \n\nTon coeur est une lettre d\'amour pour ce monde autour de toi. Les passions et les dons qu\'il a mis dans ton coeur sont une lettre pour eux. \n\n Cette lettre sera lu et contemplé de tous, et c\'est Christ qu\'il verront quand ils te verront. \n\n Ce sera et c\'est la lumière de Jésus qui brille en toi. \n\n Mais ce temps nécessitera d\'être préparée, tissé et endurcis à son image. \n\n Que ta vie soit à l\'image de ce que tu es déjà. ',
   }
 ];
 
