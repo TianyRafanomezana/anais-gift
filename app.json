@@ -4,7 +4,7 @@
     "slug": "Brand-New-Heart",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/brand-new-heart-icon-v2.png",
+    "icon": "./assets/white-icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
@@ -12,12 +12,12 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
-        "foregroundImage": "./assets/brand-new-heart-icon-v2.png"
+        "foregroundImage": "./assets/white-icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/brand-new-heart-icon-v2.png"
+      "favicon": "./assets/white-icon.png"
     },
     "plugins": [
       "expo-audio",
