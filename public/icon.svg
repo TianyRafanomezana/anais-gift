@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 32 140 140" width="1024" height="1024">
+  <defs>
+    <clipPath id="heartClip">
+      <path d="M 0 -15 C -10 -35, -55 -35, -50 5 C -45 40, -10 60, 0 75 C 10 60, 45 40, 50 5 C 55 -35, 10 -35, 0 -15" />
+    </clipPath>
+  </defs>
+
+  <!-- L'ENSEMBLE DU COEUR (Rubis) -->
+  <g transform="translate(100, 80)" clip-path="url(#heartClip)">
+    <path d="M 0 -15 C -10 -35, -55 -35, -50 5 C -45 40, -10 60, 0 75 C 10 60, 45 40, 50 5 C 55 -35, 10 -35, 0 -15" fill="#4a0a1a" />
+    <path d="M -30 4 L -15 -10 L 15 -10 L 30 4 L 0 47 Z" fill="#c41a3a" />
+    <path d="M -15 -10 L -5 -35 L 5 -35 L 15 -10 Z" fill="#ff758f" />
+    <path d="M -15 -10 L -40 -30 L -5 -35 Z" fill="#ffb3c6" />
+    <path d="M 15 -10 L 5 -35 L 40 -30 Z" fill="#c9184a" />
+    <path d="M -30 4 L -15 -10 L -40 -30 L -55 -10 Z" fill="#d62254" />
+    <path d="M 30 4 L 15 -10 L 40 -30 L 55 -10 Z" fill="#a4133c" />
+    <path d="M -30 4 L -55 -10 L -55 18 Z" fill="#c9184a" />
+    <path d="M -30 4 L -55 18 L -48 35 Z" fill="#b01340" />
+    <path d="M 30 4 L 55 -10 L 55 18 Z" fill="#8a0e30" />
+    <path d="M 30 4 L 55 18 L 48 35 Z" fill="#800f2f" />
+    <path d="M -30 4 L -48 35 L -30 52 L 0 47 Z" fill="#a4133c" />
+    <path d="M 30 4 L 48 35 L 30 52 L 0 47 Z" fill="#6d0b28" />
+    <path d="M 0 47 L -30 52 L -18 65 Z" fill="#8a0e30" />
+    <path d="M 0 47 L -18 65 L 0 80 Z" fill="#6d0b28" />
+    <path d="M 0 47 L 30 52 L 18 65 Z" fill="#700d2a" />
+    <path d="M 0 47 L 18 65 L 0 80 Z" fill="#590d22" />
+  </g>
+
+  <!-- PRONGS -->
+  <g transform="translate(100, 80)">
+    <circle cx="-45" cy="-22" r="5" fill="#cc9900" stroke="#ffe6a7" stroke-width="1.5" />
+    <circle cx="45" cy="-22" r="5" fill="#cc9900" stroke="#ffe6a7" stroke-width="1.5" />
+    <circle cx="0" cy="77" r="5" fill="#cc9900" stroke="#ffe6a7" stroke-width="1.5" />
+  </g>
+</svg>
