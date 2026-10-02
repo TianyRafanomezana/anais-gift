@@ -150,9 +150,6 @@ export default function JewelryScene({ rubyScale }: JewelrySceneProps) {
             {/* Bottom-right lower */}
             <Path d="M 0 47 L 18 65 L 0 80 Z" fill="#590d22" />
 
-            {/* Glow/Highlight subtil */}
-            <Circle cx="-8" cy="-12" r="3" fill="rgba(255,255,255,0.4)" />
-
           </G>
 
           {/* PRONGS en dehors du ClipPath pour ne pas être coupés */}
